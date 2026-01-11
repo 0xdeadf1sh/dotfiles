@@ -1,0 +1,34 @@
+[user]
+	name = 0xdeadf1sh
+    email = 0xdeadf1sh@tuta.io
+	signingkey = 5B31CC985F2862542D6DB9C0CF4DA9F3A45D9EF7
+[core]
+	editor = vim
+    symlinks = true
+[init]
+	defaultBranch = main
+[diff]
+	tool = vimdiff
+	submodule = log
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	sw = switch
+	me = merge
+	fe = fetch
+	res = restore
+	rem = remote
+	reb = rebase
+	unstage = restore --staged
+	last = log -1 -p --stat
+[commit]
+	gpgsign = true
+[pull]
+	rebase = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

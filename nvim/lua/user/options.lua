@@ -1,6 +1,6 @@
 -- General
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 vim.g.have_nerd_font = false
 
 -- Options
@@ -8,13 +8,13 @@ vim.o.encoding = "utf-8"
 vim.o.hidden = true
 vim.o.ttyfast = true
 vim.o.updatetime = 250
-vim.o.timeoutlen = 300
+vim.o.timeoutlen = 0
 vim.o.signcolumn = "yes"
 vim.o.undofile = true
 vim.o.splitright = true
 vim.o.splitbelow = true
 vim.o.list = true
-vim.o.inccommand = 'split'
+vim.o.inccommand = "split"
 vim.o.scrolloff = 10
 vim.o.confirm = true
 vim.o.showmode = false
@@ -42,12 +42,12 @@ vim.o.termguicolors = true
 vim.o.cursorline = true
 
 -- Mouse
-vim.o.mouse = 'a'
+vim.o.mouse = "a"
 
 -- Sync with OS clipboard
 vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
+	vim.o.clipboard = "unnamedplus"
 end)
 
 -- Comments
-vim.cmd('iabbrev ee ///////////////////////////////////////////////////////////////////////////')
+vim.cmd("iabbrev ee ///////////////////////////////////////////////////////////////////////////")

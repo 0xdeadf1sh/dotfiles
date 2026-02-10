@@ -77,8 +77,8 @@ export PICO_SDK_PATH=/usr/share/pico-sdk
 # disable accidental writes
 set -o noclobber
 
-# add slang (shading language) to PATH
-export PATH=$PATH:$HOME/Slang/bin
+# add slang and claude code
+export PATH=$PATH:$HOME/Slang/bin:$HOME/.local/bin
 
 # make man pages beautiful
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
@@ -106,3 +106,7 @@ export MOZ_WAYLAND=1
 
 # GCC stuff
 export ASAN_OPTIONS=use_sigaltstack=0
+
+export ANTHROPIC_BASE_URL="http://100.76.171.58:3000"
+export ANTHROPIC_AUTH_TOKEN="llama-cpp"
+export ANTHROPIC_API_KEY=""

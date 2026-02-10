@@ -13,8 +13,6 @@ rtp:prepend(lazypath)
 
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
-	"NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
-
 	-- See `:help gitsigns` to understand what the configuration keys do
 	{
 		"lewis6991/gitsigns.nvim",
@@ -516,7 +514,7 @@ require("lazy").setup({
 				-- <c-k>: Toggle signature help
 				--
 				-- See :h blink-cmp-config-keymap for defining your own keymap
-				preset = "default",
+				preset = "enter",
 
 				-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
 				--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -557,29 +555,30 @@ require("lazy").setup({
 		},
 	},
 
-	--[[
 	{
 		"ggml-org/llama.vim",
 		init = function()
 			vim.g.llama_config = {
 
+				endpoint_fim = "http://100.76.171.58:6666/infill",
+				-- endpoint_inst = "http://192.168.10.126:6666/",
+
 				-- Keybindings (FIM)
-				keymap_fim_accept_full = "<C-CR>",
-				keymap_fim_accept_line = "<S-CR>",
+				keymap_fim_accept_full = "<C-y>",
+				keymap_fim_accept_line = "<C-l>",
 				keymap_fim_accept_word = "<Nop>",
-				keymap_fim_trigger = "<C-F>",
+				keymap_fim_trigger = "<Nop>",
 
 				-- Keybindings (Instruction)
-				keymap_inst_accept = "<C-CR>",
-				keymap_inst_cancel = "<Esc>",
-				keymap_inst_trigger = "<S-F>",
+				keymap_inst_accept = "<Nop>",
+				keymap_inst_cancel = "<Nop>",
+				keymap_inst_trigger = "<Nop>",
 
 				-- Disable verbose logging
 				show_info = 0,
 			}
 		end,
 	},
-    --]]
 
 	{
 		"mrcjkb/rustaceanvim",
@@ -676,7 +675,7 @@ require("lazy").setup({
 				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
 				additional_vim_regex_highlighting = { "ruby" },
 			},
-			indent = { enable = true, disable = { "ruby" } },
+			indent = { enable = false, disable = { "ruby" } },
 		},
 		-- There are additional nvim-treesitter modules that you can use to interact
 		-- with nvim-treesitter. You should go explore a few and see what interests you:

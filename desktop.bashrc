@@ -78,7 +78,7 @@ export PICO_SDK_PATH=/usr/share/pico-sdk
 set -o noclobber
 
 # add slang and claude code
-export PATH=$PATH:$HOME/Slang/bin:$HOME/.local/bin
+export PATH=$PATH:$HOME/Desktop/slang/bin:$HOME/.local/bin
 
 # make man pages beautiful
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
@@ -95,9 +95,6 @@ alias cmatrix='cmatrix -C white'
 # enable unified memory for llama.cpp
 export GGML_CUDA_ENABLE_UNIFIED_MEMORY=1
 
-# add emscripten to PATH
-export PATH=$PATH:/usr/lib/emscripten
-
 # increase the size of tracy's UI
 export TRACY_DPI_SCALE=1.5
 
@@ -107,6 +104,7 @@ export MOZ_WAYLAND=1
 # GCC stuff
 export ASAN_OPTIONS=use_sigaltstack=0
 
+# claude stuff
 export ANTHROPIC_BASE_URL="http://100.76.171.58:3000"
 export ANTHROPIC_AUTH_TOKEN="llama-cpp"
 export ANTHROPIC_API_KEY=""

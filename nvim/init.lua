@@ -30,3 +30,38 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 vim.diagnostic.config({
 	float = { focus = false },
 })
+
+local llama_group = vim.api.nvim_create_augroup("LlamaToggle", { clear = true })
+
+local function is_nolama()
+	return vim.bo.filetype:find("nolama") ~= nil
+end
+
+vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+	group = llama_group,
+	callback = function()
+		if is_nolama() then
+			-- Attempt to use built-in command, fallback to manual clearing
+			if vim.fn.exists(":LlamaDisable") == 2 then
+				vim.cmd("LlamaDisable")
+			else
+				-- Fallback: Directly clear the plugin's autocommand group
+				pcall(vim.api.nvim_clear_autocmds, { group = "llama" })
+			end
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "BufLeave", "WinLeave" }, {
+	group = llama_group,
+	callback = function()
+		if is_nolama() then
+			if vim.fn.exists(":LlamaEnable") == 2 then
+				vim.cmd("LlamaEnable")
+			else
+				-- Fallback: Re-initialize the plugin to restore autocommands
+				pcall(vim.fn["llama#init"])
+			end
+		end
+	end,
+})

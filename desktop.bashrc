@@ -105,6 +105,10 @@ export MOZ_WAYLAND=1
 export ASAN_OPTIONS=use_sigaltstack=0
 
 # claude stuff
-export ANTHROPIC_BASE_URL="http://100.76.171.58:3000"
-export ANTHROPIC_AUTH_TOKEN="llama-cpp"
-export ANTHROPIC_API_KEY=""
+# export ANTHROPIC_BASE_URL="http://100.76.171.58:3000"
+# export ANTHROPIC_AUTH_TOKEN="llama-cpp"
+# export ANTHROPIC_API_KEY=""
+
+# source /opt/esp-idf/export.sh
+
+uwufetch

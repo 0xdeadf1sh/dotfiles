@@ -33,33 +33,37 @@ vim.diagnostic.config({
 
 local llama_group = vim.api.nvim_create_augroup("LlamaToggle", { clear = true })
 
-local function is_nolama()
-	return vim.bo.filetype:find("nolama") ~= nil
-end
-
-vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+-- 1. Detect the marker when a file is opened
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 	group = llama_group,
 	callback = function()
-		if is_nolama() then
-			-- Attempt to use built-in command, fallback to manual clearing
-			if vim.fn.exists(":LlamaDisable") == 2 then
-				vim.cmd("LlamaDisable")
-			else
-				-- Fallback: Directly clear the plugin's autocommand group
-				pcall(vim.api.nvim_clear_autocmds, { group = "llama" })
+		-- Scan the first 5 lines for the "llama:disable" string
+		local lines = vim.api.nvim_buf_get_lines(0, 0, 5, false)
+		for _, line in ipairs(lines) do
+			if line:find("llama:disable") then
+				vim.b.llama_disabled = true
+				break
 			end
 		end
 	end,
 })
 
-vim.api.nvim_create_autocmd({ "BufLeave", "WinLeave" }, {
+-- 2. Toggle Llama globally based on the current buffer's setting
+vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
 	group = llama_group,
 	callback = function()
-		if is_nolama() then
+		if vim.b.llama_disabled then
+			-- Disable llama for this buffer/window
+			if vim.fn.exists(":LlamaDisable") == 2 then
+				vim.cmd("LlamaDisable")
+			else
+				pcall(vim.api.nvim_clear_autocmds, { group = "llama" })
+			end
+		else
+			-- Re-enable llama when entering a normal buffer
 			if vim.fn.exists(":LlamaEnable") == 2 then
 				vim.cmd("LlamaEnable")
-			else
-				-- Fallback: Re-initialize the plugin to restore autocommands
+			elseif vim.fn.exists("*llama#init") == 1 then
 				pcall(vim.fn["llama#init"])
 			end
 		end

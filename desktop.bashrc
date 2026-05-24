@@ -110,5 +110,3 @@ export ASAN_OPTIONS=use_sigaltstack=0
 # export ANTHROPIC_API_KEY=""
 
 # source /opt/esp-idf/export.sh
-
-uwufetch

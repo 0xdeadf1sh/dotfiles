@@ -1,0 +1,18 @@
+{
+  "model": "opus",
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "theme": "dark",
+  "voiceEnabled": true,
+  "statusLine": {
+    "type": "command",
+    "command": "python3 /home/omar/.claude/statusline-command.sh"
+  }
+}

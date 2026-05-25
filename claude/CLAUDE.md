@@ -44,6 +44,9 @@ Generalist developer:
   — I read the diff.
 - **Comments**: default to none. Only write a comment when the *why* is
   non-obvious. Never restate what the code does.
+- **Commit messages**: a single sentence, always. No multi-paragraph
+  bodies, no bullet lists, no before/after tables. If a change can't be
+  summarized in one sentence, split it into multiple commits.
 
 ## Environment
 

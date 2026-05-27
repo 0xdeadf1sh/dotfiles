@@ -48,6 +48,37 @@ Generalist developer:
   bodies, no bullet lists, no before/after tables. If a change can't be
   summarized in one sentence, split it into multiple commits.
 
+## Public vs private documents
+
+Some files in a repo are public; others are working notes. Treat these
+paths as **public** by default and never write internal-flavoured content
+to them:
+
+- `README.md`, `README.*` at any level
+- anything under `reports/`, `docs/`, `examples/`, `samples/`
+- `CHANGELOG*`, `RELEASE*`, `CONTRIBUTING*`, `LICENSE*`
+- anything you'd expect to ship to GitHub, npm, PyPI, or a download
+  page
+
+**Never** write to a public file the kind of content that lives in a
+developer-to-developer chat:
+
+- prescriptive "likely fix" / "should reduce" / "try lowering X" prose
+- per-file priority lists, ranked action items, "to do in the next pass"
+- prose addressed to the reader in the second person
+- speculation about what the maintainer should change next
+- raw conversation transcripts or pasted assistant turns
+
+Reports comparing the code against external data may state *observed*
+gaps neutrally ("metric X is +N% vs reference Y"), but **must not**
+propose remediation in the same artefact. Remediation belongs in a
+commit message, a PR description, an issue, or a gitignored note —
+never in a file that ships.
+
+If an internal-flavoured artefact is genuinely needed, put it under a
+gitignored path (`scratch/`, `NOTES.md`, `*.local.md`, `*.private.md`,
+etc.) and confirm the path is `.gitignore`'d **before** writing.
+
 ## Environment
 
 This config follows me across machines — always Linux, but the distro

@@ -23,7 +23,7 @@ GRAY   = "\033[38;5;245m"
 RED    = "\033[38;5;167m"
 
 # --- Nerd Font icons (replace with plain text if you don't have a Nerd Font)
-USER_ICON   = "👤"
+USER_ICON   = "🐟"
 DISTRO_ICON = "🐧"
 DIR_ICON    = "📁"
 GIT_ICON    = "🌿"

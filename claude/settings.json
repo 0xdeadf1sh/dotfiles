@@ -1,5 +1,7 @@
 {
-  "model": "opus",
+  "permissions": {
+    "defaultMode": "auto"
+  },
   "statusLine": {
     "type": "command",
     "command": "python3 /home/omar/.claude/statusline-command.sh"
@@ -7,16 +9,13 @@
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
   "theme": "dark",
-  "voiceEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "permissions": {
-    "defaultMode": "auto"
-  }
+  "voiceEnabled": true
 }

@@ -37,6 +37,7 @@ SKILL_ICON  = "🧰"
 CTX_ICON    = "📊"
 
 CONTEXT_WINDOWS = {
+    "claude-opus-4-8":     200_000,
     "claude-opus-4-7":   1_000_000,
     "claude-opus-4-6":     200_000,
     "claude-sonnet-4-6": 1_000_000,
@@ -44,6 +45,16 @@ CONTEXT_WINDOWS = {
     "claude-haiku-4-5":    200_000,
 }
 DEFAULT_WINDOW = 200_000
+
+
+def context_window(model_id: str) -> int:
+    """Resolve the context window for a model id. A trailing `[1m]` (e.g.
+    `claude-opus-4-8[1m]`) is the 1M-beta marker and overrides everything;
+    otherwise strip any `[...]` suffix and look up the base id."""
+    if model_id.endswith("[1m]"):
+        return 1_000_000
+    base = model_id.split("[", 1)[0]
+    return CONTEXT_WINDOWS.get(base, DEFAULT_WINDOW)
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -372,7 +383,7 @@ def main() -> None:
     parts.append(f"{BOLD}{YELLOW}{SKILL_ICON}  {skill_n}{RESET}")
 
     used = context_tokens(transcript)
-    window = CONTEXT_WINDOWS.get(model_id, DEFAULT_WINDOW)
+    window = context_window(model_id)
     pct = (used / window * 100) if used is not None else 0.0
     if used is not None:
         col = ctx_color(pct)

@@ -4,7 +4,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "python3 /home/omar/.claude/statusline-command.sh"
+    "command": "python3 \"$HOME/.claude/statusline-command.sh\""
   },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true

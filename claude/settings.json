@@ -7,7 +7,9 @@
     "command": "python3 \"$HOME/.claude/statusline-command.sh\""
   },
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
   "tui": "fullscreen",

@@ -28,6 +28,7 @@ DISTRO_ICON = "🐧"
 DIR_ICON    = "📁"
 GIT_ICON    = "🌿"
 MODEL_ICON  = "✨"
+EFFORT_ICON = "⚡"
 SUB_ICON    = "💎"
 API_ICON    = "🔑"
 CLOUD_ICON  = "☁️ "
@@ -202,6 +203,20 @@ def ctx_color(pct: float) -> str:
     return GREEN
 
 
+# Effort scales green → red with intensity; "max" gets the bold-red treatment.
+EFFORT_COLORS = {
+    "low":    GREEN,
+    "medium": CYAN,
+    "high":   YELLOW,
+    "xhigh":  PURPLE,
+    "max":    "\x1b[1;38;5;203m",
+}
+
+
+def effort_color(level: str) -> str:
+    return EFFORT_COLORS.get(level, GRAY)
+
+
 # --- Pacman animation ---------------------------------------------------
 # Stateless: every visible thing is a pure function of (width, time.time()).
 # Pacman triangle-waves across [0, width-1]; the last time he visited each
@@ -231,22 +246,13 @@ def next_frame() -> int:
 PAC_YELLOW  = "\x1b[1;38;5;226m"  # bright pacman
 TRAIL_YEL   = "\x1b[38;5;221m"    # consumed-road yellow
 DOT_DIM     = "\x1b[2;38;5;245m"  # available-road grey
-CHERRY_RED  = "\x1b[1;38;5;203m"  # uneaten cherry
-CHERRY_DIM  = "\x1b[2;38;5;203m"  # eaten cherry
+CHERRY_RED  = "\x1b[1;38;5;203m"  # uneaten heart
+CHERRY_DIM  = "\x1b[2;38;5;203m"  # eaten heart (single-cell fallback)
 
 
-def _ahead_glyph(i: int) -> str:
-    """Cell glyph for road ahead of pacman (available context)."""
-    if (i + 7) % 23 == 0:
-        return f"{CHERRY_RED}♥{RESET}"
-    return f"{DOT_DIM}·{RESET}"
-
-
-def _behind_glyph(i: int) -> str:
-    """Cell glyph for road behind pacman (consumed context)."""
-    if (i + 7) % 23 == 0:
-        return f"{CHERRY_DIM}♥{RESET}"
-    return f"{TRAIL_YEL}•{RESET}"
+def _is_heart(i: int) -> bool:
+    """Whether road cell `i` carries a heart rather than a plain dot."""
+    return (i + 7) % 23 == 0
 
 
 def pacman_fill(width: int, pct: float, frame: int) -> str:
@@ -265,14 +271,29 @@ def pacman_fill(width: int, pct: float, frame: int) -> str:
     chomp_open = (frame % 2 == 0)
     pac_glyph = "ᗧ" if chomp_open else "●"
 
+    # `💔` is a 2-cell emoji while every other road glyph is 1 cell, so a
+    # broken heart consumes the column to its right to keep the road's total
+    # display width exactly `width` — otherwise it eats into the SAFETY margin
+    # and the TUI truncates the line.
     out = []
-    for i in range(width):
+    i = 0
+    while i < width:
         if i == pac_x:
             out.append(f"{PAC_YELLOW}{pac_glyph}{RESET}")
-        elif i < pac_x:
-            out.append(_behind_glyph(i))
-        else:
-            out.append(_ahead_glyph(i))
+        elif i < pac_x:  # behind = consumed
+            if _is_heart(i) and i + 1 < width and i + 1 != pac_x:
+                out.append("💔")
+                i += 1  # the emoji visually covers this next column too
+            elif _is_heart(i):
+                out.append(f"{CHERRY_DIM}♥{RESET}")  # no room to break it
+            else:
+                out.append(f"{TRAIL_YEL}•{RESET}")
+        else:  # ahead = available
+            if _is_heart(i):
+                out.append(f"{CHERRY_RED}♥{RESET}")
+            else:
+                out.append(f"{DOT_DIM}·{RESET}")
+        i += 1
     return "".join(out)
 
 
@@ -375,6 +396,9 @@ def main() -> None:
         parts.append(f"{BOLD}{YELLOW}{GIT_ICON}  {branch}{RESET}")
     if model_name:
         parts.append(f"{BOLD}{PURPLE}{MODEL_ICON}  {model_name}{RESET}")
+    effort = (data.get("effort") or {}).get("level")
+    if effort:
+        parts.append(f"{BOLD}{effort_color(effort)}{EFFORT_ICON}  {effort}{RESET}")
     parts.append(f"{BOLD}{prov_color}{prov_icon}  {prov_label}{RESET}")
 
     mem_n = count_memories(cwd)

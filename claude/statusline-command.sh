@@ -38,9 +38,9 @@ SKILL_ICON  = "🧰"
 CTX_ICON    = "📊"
 
 CONTEXT_WINDOWS = {
-    "claude-opus-4-8":     200_000,
+    "claude-opus-4-8":   1_000_000,
     "claude-opus-4-7":   1_000_000,
-    "claude-opus-4-6":     200_000,
+    "claude-opus-4-6":   1_000_000,
     "claude-sonnet-4-6": 1_000_000,
     "claude-sonnet-4-5":   200_000,
     "claude-haiku-4-5":    200_000,
@@ -48,14 +48,19 @@ CONTEXT_WINDOWS = {
 DEFAULT_WINDOW = 200_000
 
 
-def context_window(model_id: str) -> int:
+def context_window(model_id: str, used: int | None = None) -> int:
     """Resolve the context window for a model id. A trailing `[1m]` (e.g.
     `claude-opus-4-8[1m]`) is the 1M-beta marker and overrides everything;
-    otherwise strip any `[...]` suffix and look up the base id."""
+    otherwise strip any `[...]` suffix and look up the base id. As a final
+    safety net, if observed usage already exceeds the looked-up window the
+    window must really be the 1M tier — so we never render a >100% bar."""
     if model_id.endswith("[1m]"):
         return 1_000_000
     base = model_id.split("[", 1)[0]
-    return CONTEXT_WINDOWS.get(base, DEFAULT_WINDOW)
+    win = CONTEXT_WINDOWS.get(base, DEFAULT_WINDOW)
+    if used is not None and used > win:
+        return 1_000_000
+    return win
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -407,7 +412,7 @@ def main() -> None:
     parts.append(f"{BOLD}{YELLOW}{SKILL_ICON}  {skill_n}{RESET}")
 
     used = context_tokens(transcript)
-    window = context_window(model_id)
+    window = context_window(model_id, used)
     pct = (used / window * 100) if used is not None else 0.0
     if used is not None:
         col = ctx_color(pct)

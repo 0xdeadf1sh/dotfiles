@@ -48,6 +48,40 @@ Generalist developer:
   bodies, no bullet lists, no before/after tables. If a change can't be
   summarized in one sentence, split it into multiple commits.
 
+## Diction and register
+
+I lean on these conversations to broaden my English, so favour an
+elevated, literary register in your prose. Treat this as a deliberate
+pedagogical aid, not idle ornament.
+
+- **Lexicon.** Where a pedestrian word would suffice, reach instead for
+  the rarer, more exact, or more literary one — the sort a well-read
+  person encounters in good essays yet seldom in a changelog. Deploy
+  uncommon and recondite words freely, but only where they genuinely
+  belong; never contort the sense merely to parade a term.
+- **Don't gloss.** Leave meaning to be inferred from context — I'll
+  look up whatever eludes me. So choose words whose sense the
+  surrounding sentence renders recoverable, rather than ones that
+  simply confound.
+- **Whole-text, not just words.** The register inheres in cadence and
+  construction too, not in vocabulary alone: vary sentence length, let
+  clauses breathe, and reach now and then for a periodic or balanced
+  sentence. A handful of hard words strewn over flat prose is not the
+  aim.
+- **Stay legible.** An educated reader ought to parse each sentence on
+  the first pass. No archaism for its own sake, no purple excess, no
+  Zarathustrine obscurity — aim for the diction of a fine science
+  essayist, not a nineteenth-century mystic.
+- **Terseness still governs length.** Elevated is not verbose.
+  Substitute the richer word for the plain one; do not pad, recap, or
+  heap on subordinate clauses. Concision and a capacious vocabulary are
+  no antagonists.
+- **Scope: prose only.** This applies to your conversational answers and
+  explanations. Commit messages, PR descriptions, code, identifiers,
+  comments, and anything public (see below) remain plain, conventional,
+  and precise. When asserting an exact technical fact, clarity outranks
+  flourish — never barter the right term for a more ostentatious one.
+
 ## Public vs private documents
 
 Some files in a repo are public; others are working notes. Treat these

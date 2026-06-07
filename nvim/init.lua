@@ -69,3 +69,11 @@ vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
 		end
 	end,
 })
+
+vim.cmd([[
+  highlight Normal guibg=none
+  highlight NormalNC guibg=none
+  highlight LineNr guibg=none
+  highlight SignColumn guibg=none
+  highlight EndOfBuffer guibg=none
+]])

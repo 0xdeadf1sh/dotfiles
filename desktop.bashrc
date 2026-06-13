@@ -53,9 +53,9 @@ export PAGER=less
 
 # nice-looking prompt
 if [ $USER == "root" ]; then
-    export PS1="[\[\033[1;31m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
+    export PS1="🐧 [\[\033[1;31m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
 else
-    export PS1="[\[\033[1;32m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
+    export PS1="🐧 [\[\033[1;32m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
 fi
 
 # fix git's gpg signing problem

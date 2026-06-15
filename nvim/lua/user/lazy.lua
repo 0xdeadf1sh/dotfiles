@@ -346,6 +346,11 @@ require("lazy").setup({
 					end,
 				},
 			})
+
+			require("lspconfig").wgsl_analyzer.setup({
+				on_attach = on_attach,
+				capabilities = capabilities,
+			})
 		end,
 	},
 
@@ -577,10 +582,10 @@ require("lazy").setup({
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
+		branch = "main",
 		build = ":TSUpdate",
-		main = "nvim-treesitter", -- Sets main module to use for opts
-		opts = {
-			ensure_installed = {
+		config = function()
+			local langs = {
 				"bash",
 				"c",
 				"diff",
@@ -592,14 +597,14 @@ require("lazy").setup({
 				"query",
 				"vim",
 				"vimdoc",
-			},
-			-- Autoinstall languages that are not installed
-			auto_install = true,
-			highlight = {
-				enable = true,
-				additional_vim_regex_highlighting = { "ruby" },
-			},
-			indent = { enable = false, disable = { "ruby" } },
-		},
+				"wgsl",
+			}
+			require("nvim-treesitter").install(langs)
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					pcall(vim.treesitter.start, args.buf)
+				end,
+			})
+		end,
 	},
 })

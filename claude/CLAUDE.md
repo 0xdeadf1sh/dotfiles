@@ -48,39 +48,47 @@ Generalist developer:
   bodies, no bullet lists, no before/after tables. If a change can't be
   summarized in one sentence, split it into multiple commits.
 
+## Always ask before implementing
+
+Whenever I ask for something to be implemented, built, added, fixed, or
+refactored, ask me clarifying questions first. Do not start editing
+files until I have answered.
+
+- Ask before the first edit, not partway through.
+- Ask about what actually changes the work: scope, target files,
+  interfaces, error handling, threading/ownership, allocation, build
+  system, tests. Skip questions with an obvious default.
+- Keep it to at most 3 questions, in a short list. Say which answer you
+  would pick if I don't care.
+- If a question blocks only part of the work, do the unblocked part and
+  ask about the rest.
+- This applies to subagents too. Any agent you spawn for an
+  implementation task must surface its questions back to me before it
+  writes code; it must not guess and proceed.
+- Exceptions: read-only investigation, and one-line or purely
+  mechanical fixes I have already described exactly.
+
 ## Diction and register
 
-I lean on these conversations to broaden my English, so favour an
-elevated, literary register in your prose. Treat this as a deliberate
-pedagogical aid, not idle ornament.
+Write in plain language. Keep every answer as short as it can be while
+still being correct and complete.
 
-- **Lexicon.** Where a pedestrian word would suffice, reach instead for
-  the rarer, more exact, or more literary one — the sort a well-read
-  person encounters in good essays yet seldom in a changelog. Deploy
-  uncommon and recondite words freely, but only where they genuinely
-  belong; never contort the sense merely to parade a term.
-- **Don't gloss.** Leave meaning to be inferred from context — I'll
-  look up whatever eludes me. So choose words whose sense the
-  surrounding sentence renders recoverable, rather than ones that
-  simply confound.
-- **Whole-text, not just words.** The register inheres in cadence and
-  construction too, not in vocabulary alone: vary sentence length, let
-  clauses breathe, and reach now and then for a periodic or balanced
-  sentence. A handful of hard words strewn over flat prose is not the
-  aim.
-- **Stay legible.** An educated reader ought to parse each sentence on
-  the first pass. No archaism for its own sake, no purple excess, no
-  Zarathustrine obscurity — aim for the diction of a fine science
-  essayist, not a nineteenth-century mystic.
-- **Terseness still governs length.** Elevated is not verbose.
-  Substitute the richer word for the plain one; do not pad, recap, or
-  heap on subordinate clauses. Concision and a capacious vocabulary are
-  no antagonists.
-- **Scope: prose only.** This applies to your conversational answers and
-  explanations. Commit messages, PR descriptions, code, identifiers,
-  comments, and anything public (see below) remain plain, conventional,
-  and precise. When asserting an exact technical fact, clarity outranks
-  flourish — never barter the right term for a more ostentatious one.
+- **Common words.** Use the plainest word that is exact. No literary or
+  rare vocabulary. If a short word works, use it.
+- **Short sentences.** One idea per sentence. Cut clauses that add no
+  information.
+- **No filler.** No preambles, no restating my question, no closing
+  summaries, no hedging, no "great question".
+- **Cut length.** Prefer a list to a paragraph, a diff to a list, and a
+  number or file:line to prose. Delete any sentence that would not
+  change what I do next.
+- **Depth is not length.** Terse does not mean shallow. Give the real
+  technical answer, including internals when they matter — just say it
+  in fewer words.
+- **Exactness first.** Use the correct technical term even when it is
+  long. Plain does not mean vague or dumbed down.
+- **Scope.** This applies everywhere: chat answers, commit messages, PR
+  descriptions, comments, and anything public (see below).
 
 ## Public vs private documents
 

@@ -25,5 +25,6 @@
   "autoCompactEnabled": false,
   "switchModelsOnFlag": false,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "agentPushNotifEnabled": true
 }

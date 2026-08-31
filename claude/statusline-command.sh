@@ -37,30 +37,8 @@ MEM_ICON    = "🧠"
 SKILL_ICON  = "🧰"
 CTX_ICON    = "📊"
 
-CONTEXT_WINDOWS = {
-    "claude-opus-4-8":   1_000_000,
-    "claude-opus-4-7":   1_000_000,
-    "claude-opus-4-6":   1_000_000,
-    "claude-sonnet-4-6": 1_000_000,
-    "claude-sonnet-4-5":   200_000,
-    "claude-haiku-4-5":    200_000,
-}
-DEFAULT_WINDOW = 200_000
+CONTEXT_WINDOW = 1_000_000
 
-
-def context_window(model_id: str, used: int | None = None) -> int:
-    """Resolve the context window for a model id. A trailing `[1m]` (e.g.
-    `claude-opus-4-8[1m]`) is the 1M-beta marker and overrides everything;
-    otherwise strip any `[...]` suffix and look up the base id. As a final
-    safety net, if observed usage already exceeds the looked-up window the
-    window must really be the 1M tier — so we never render a >100% bar."""
-    if model_id.endswith("[1m]"):
-        return 1_000_000
-    base = model_id.split("[", 1)[0]
-    win = CONTEXT_WINDOWS.get(base, DEFAULT_WINDOW)
-    if used is not None and used > win:
-        return 1_000_000
-    return win
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -251,13 +229,16 @@ def next_frame() -> int:
 PAC_YELLOW  = "\x1b[1;38;5;226m"  # bright pacman
 TRAIL_YEL   = "\x1b[38;5;221m"    # consumed-road yellow
 DOT_DIM     = "\x1b[2;38;5;245m"  # available-road grey
-CHERRY_RED  = "\x1b[1;38;5;203m"  # uneaten heart
-CHERRY_DIM  = "\x1b[2;38;5;203m"  # eaten heart (single-cell fallback)
+FRUITS      = ("🍒", "🍓", "🍊", "🍎", "🍈")
+
+FRUIT_EVERY = 23
 
 
-def _is_heart(i: int) -> bool:
-    """Whether road cell `i` carries a heart rather than a plain dot."""
-    return (i + 7) % 23 == 0
+def _fruit(i: int) -> str | None:
+    """The fruit on road cell `i`, or None for a plain dot."""
+    if (i + 7) % FRUIT_EVERY:
+        return None
+    return FRUITS[((i + 7) // FRUIT_EVERY - 1) % len(FRUITS)]
 
 
 def pacman_fill(width: int, pct: float, frame: int) -> str:
@@ -276,26 +257,22 @@ def pacman_fill(width: int, pct: float, frame: int) -> str:
     chomp_open = (frame % 2 == 0)
     pac_glyph = "ᗧ" if chomp_open else "●"
 
-    # `💔` is a 2-cell emoji while every other road glyph is 1 cell, so a
-    # broken heart consumes the column to its right to keep the road's total
-    # display width exactly `width` — otherwise it eats into the SAFETY margin
-    # and the TUI truncates the line.
+    # Fruit emoji are 2 cells while every other road glyph is 1, so a fruit
+    # consumes the column to its right to keep the road's total display width
+    # exactly `width` — otherwise it eats into the SAFETY margin and the TUI
+    # truncates the line.
     out = []
     i = 0
     while i < width:
         if i == pac_x:
             out.append(f"{PAC_YELLOW}{pac_glyph}{RESET}")
         elif i < pac_x:  # behind = consumed
-            if _is_heart(i) and i + 1 < width and i + 1 != pac_x:
-                out.append("💔")
-                i += 1  # the emoji visually covers this next column too
-            elif _is_heart(i):
-                out.append(f"{CHERRY_DIM}♥{RESET}")  # no room to break it
-            else:
-                out.append(f"{TRAIL_YEL}•{RESET}")
+            out.append(f"{TRAIL_YEL}•{RESET}")
         else:  # ahead = available
-            if _is_heart(i):
-                out.append(f"{CHERRY_RED}♥{RESET}")
+            fruit = _fruit(i)
+            if fruit and i + 1 < width and i + 1 != pac_x:
+                out.append(fruit)
+                i += 1  # the emoji visually covers this next column too
             else:
                 out.append(f"{DOT_DIM}·{RESET}")
         i += 1
@@ -383,7 +360,6 @@ def main() -> None:
     cwd = (data.get("workspace") or {}).get("current_dir") or data.get("cwd") or os.getcwd()
     model = data.get("model") or {}
     model_name = model.get("display_name") or ""
-    model_id = model.get("id") or ""
     transcript = data.get("transcript_path") or ""
 
     user = os.environ.get("USER") or os.environ.get("LOGNAME") or "user"
@@ -412,7 +388,7 @@ def main() -> None:
     parts.append(f"{BOLD}{YELLOW}{SKILL_ICON}  {skill_n}{RESET}")
 
     used = context_tokens(transcript)
-    window = context_window(model_id, used)
+    window = CONTEXT_WINDOW
     pct = (used / window * 100) if used is not None else 0.0
     if used is not None:
         col = ctx_color(pct)

@@ -6,6 +6,7 @@ symlinked into `~/.claude/`:
 - `~/.claude/settings.json` → `~/Desktop/dotfiles/claude/settings.json`
 - `~/.claude/statusline-command.sh` → `~/Desktop/dotfiles/claude/statusline-command.sh`
 - `~/.claude/CLAUDE.md` → `~/Desktop/dotfiles/claude/CLAUDE.md`
+- `~/.claude/hooks/` → `~/Desktop/dotfiles/claude/hooks/`
 
 When editing any of these, write through the symlink (the default for
 most tools — just edit the path you'd normally edit). The dotfiles dir

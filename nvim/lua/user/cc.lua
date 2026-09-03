@@ -70,4 +70,27 @@ function M.clangify(argv, ft)
 	return out
 end
 
+--- size and align per record; C omits the dsize field that C++ emits, so match loosely
+function M.parse_layouts(text)
+	local out = {}
+	for block in ("\n" .. text .. "\n\n"):gmatch("%*%*%* Dumping AST Record Layout(.-)\n%s*\n") do
+		local name = block:match("|%s*[%w_]+%s+([%w_:]+)")
+		local size, align = block:match("%[sizeof=(%d+),[^%]]-align=(%d+)")
+		if name and size then
+			out[name] = { size = tonumber(size), align = tonumber(align) }
+		end
+	end
+	return out
+end
+
+--- clang is the only one of the two that can dump record layouts
+function M.layouts(path, ft, cb)
+	local argv, cwd = M.base(path, ft)
+	argv = M.clangify(argv, ft)
+	vim.list_extend(argv, { "-Xclang", "-fdump-record-layouts-complete", "-fsyntax-only" })
+	vim.system(argv, { cwd = cwd, text = true }, function(res)
+		cb(res.code == 0 and M.parse_layouts(res.stdout or "") or {})
+	end)
+end
+
 return M

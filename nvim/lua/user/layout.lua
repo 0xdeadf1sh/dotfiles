@@ -20,19 +20,6 @@ local QUERIES = {
   ]],
 }
 
---- size and align; C omits the dsize field that C++ emits, so match loosely
-local function parse_clang(text)
-	local out = {}
-	for block in ("\n" .. text .. "\n\n"):gmatch("%*%*%* Dumping AST Record Layout(.-)\n%s*\n") do
-		local name = block:match("|%s*[%w_]+%s+([%w_:]+)")
-		local size, align = block:match("%[sizeof=(%d+),[^%]]-align=(%d+)")
-		if name and size then
-			out[name] = { size = tonumber(size), align = tonumber(align) }
-		end
-	end
-	return out
-end
-
 local function parse_pahole(text)
 	local out, cur = {}, nil
 	for line in (text .. "\n"):gmatch("(.-)\n") do
@@ -148,7 +135,7 @@ function M.refresh(buf)
 	end
 
 	vim.system(dump, { cwd = cwd, text = true }, function(res)
-		layouts = res.code == 0 and parse_clang(res.stdout or "") or {}
+		layouts = res.code == 0 and cc.parse_layouts(res.stdout or "") or {}
 		done()
 	end)
 

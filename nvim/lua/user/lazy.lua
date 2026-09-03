@@ -160,9 +160,6 @@ require("lazy").setup({
 			"mason-org/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 
-			-- Useful status updates for LSP.
-			{ "j-hui/fidget.nvim", opts = {} },
-
 			-- Allows extra capabilities provided by blink.cmp
 			"saghen/blink.cmp",
 		},
@@ -304,53 +301,31 @@ require("lazy").setup({
 				},
 			})
 
-			local capabilities = require("blink.cmp").get_lsp_capabilities()
+			vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 
-			local servers = {
-
-				clangd = {},
-
-				pyright = {},
-
-				rust_analyzer = {},
-
-				ts_ls = {},
-
-				lua_ls = {
-					settings = {
-						Lua = {
-							completion = {
-								callSnippet = "Replace",
-							},
-						},
-					},
-				},
-			}
-
-			local ensure_installed = vim.tbl_keys(servers or {})
-
-			vim.list_extend(ensure_installed, {
-				"stylua",
+			vim.lsp.config("lua_ls", {
+				settings = { Lua = { completion = { callSnippet = "Replace" } } },
 			})
 
-			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+			require("mason-tool-installer").setup({
+				ensure_installed = {
+					"asm_lsp",
+					"clangd",
+					"lua_ls",
+					"ruff",
+					"wgsl_analyzer",
+					"rust_analyzer",
+					"ts_ls",
+					"stylua",
+				},
+			})
 
+			-- rustaceanvim and typescript-tools start their own clients for the first two
 			require("mason-lspconfig").setup({
-				ensure_installed = {},
-				automatic_installation = false,
-				handlers = {
-					function(server_name)
-						local server = servers[server_name] or {}
-						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-						require("lspconfig")[server_name].setup(server)
-					end,
-				},
+				automatic_enable = { exclude = { "rust_analyzer", "ts_ls", "pyright" } },
 			})
 
-			require("lspconfig").wgsl_analyzer.setup({
-				on_attach = on_attach,
-				capabilities = capabilities,
-			})
+			vim.lsp.enable("wgsl_analyzer")
 		end,
 	},
 
@@ -383,6 +358,7 @@ require("lazy").setup({
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
+				python = { "ruff_organize_imports", "ruff_format" },
 			},
 		},
 	},
@@ -391,22 +367,7 @@ require("lazy").setup({
 		"saghen/blink.cmp",
 		event = "VimEnter",
 		version = "1.*",
-		dependencies = {
-			-- Snippet Engine
-			{
-				"L3MON4D3/LuaSnip",
-				version = "2.*",
-				build = (function()
-					if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-						return
-					end
-					return "make install_jsregexp"
-				end)(),
-				dependencies = {},
-				opts = {},
-			},
-			"folke/lazydev.nvim",
-		},
+		dependencies = { "folke/lazydev.nvim" },
 		--- @module 'blink.cmp'
 		--- @type blink.cmp.Config
 		opts = {
@@ -428,8 +389,6 @@ require("lazy").setup({
 					lazydev = { module = "lazydev.integrations.blink", score_offset = 100 },
 				},
 			},
-
-			snippets = { preset = "luasnip" },
 
 			-- See :h blink-cmp-config-fuzzy for more information
 			fuzzy = { implementation = "lua" },
@@ -532,16 +491,83 @@ require("lazy").setup({
 	},
 
 	{
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+			"theHamsta/nvim-dap-virtual-text",
+			"jay-babu/mason-nvim-dap.nvim",
+		},
+		keys = {
+			{ "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "[D]ebug [B]reakpoint" },
+			{ "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Condition: ")) end, desc = "[D]ebug conditional [B]reakpoint" },
+			{ "<leader>dc", function() require("dap").continue() end, desc = "[D]ebug [C]ontinue" },
+			{ "<leader>di", function() require("dap").step_into() end, desc = "[D]ebug step [I]nto" },
+			{ "<leader>do", function() require("dap").step_over() end, desc = "[D]ebug step [O]ver" },
+			{ "<leader>dO", function() require("dap").step_out() end, desc = "[D]ebug step [O]ut" },
+			{ "<leader>dr", function() require("dap").run_last() end, desc = "[D]ebug [R]un last" },
+			{ "<leader>dx", function() require("dap").terminate() end, desc = "[D]ebug terminate" },
+			{ "<leader>du", function() require("dapui").toggle() end, desc = "[D]ebug toggle [U]I" },
+			{ "<leader>de", function() require("dapui").eval() end, mode = { "n", "v" }, desc = "[D]ebug [E]val" },
+		},
+		config = function()
+			local dap, dapui = require("dap"), require("dapui")
+
+			require("mason-nvim-dap").setup({
+				ensure_installed = { "codelldb", "python" },
+				automatic_installation = true,
+				handlers = {},
+			})
+
+			dapui.setup()
+			require("nvim-dap-virtual-text").setup({})
+
+			dap.listeners.after.event_initialized["dapui"] = dapui.open
+			dap.listeners.before.event_terminated["dapui"] = dapui.close
+			dap.listeners.before.event_exited["dapui"] = dapui.close
+
+			for ft, adapter in pairs({ c = "codelldb", cpp = "codelldb" }) do
+				dap.configurations[ft] = {
+					{
+						name = "Launch",
+						type = adapter,
+						request = "launch",
+						cwd = "${workspaceFolder}",
+						stopOnEntry = false,
+						program = function()
+							return vim.fn.input("Executable: ", vim.fn.getcwd() .. "/", "file")
+						end,
+					},
+				}
+			end
+		end,
+	},
+
+	{
 		"mrcjkb/rustaceanvim",
 		version = "^6",
 		lazy = false, -- This plugin is already lazy
 	},
 
-	{ "famiu/bufdelete.nvim" },
-
 	{
 		"pmizio/typescript-tools.nvim",
 		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+		opts = {},
+	},
+
+	{
+		"p00f/clangd_extensions.nvim",
+		ft = { "c", "cpp" },
+		opts = {},
+	},
+
+	{
+		"MagicDuck/grug-far.nvim",
+		cmd = "GrugFar",
+		keys = {
+			{ "<leader>sR", function() require("grug-far").open() end, desc = "[S]earch and [R]eplace" },
+			{ "<leader>sW", function() require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } }) end, desc = "Replace [W]ord under cursor" },
+		},
 		opts = {},
 	},
 
@@ -550,7 +576,13 @@ require("lazy").setup({
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		opts = { theme = "github-theme" },
+		opts = {
+			theme = "github-theme",
+			sections = {
+				lualine_c = { "filename", { vim.lsp.status } },
+				lualine_z = { "%2l:%-2v" },
+			},
+		},
 	},
 
 	-- Highlight todo, notes, etc in comments
@@ -569,15 +601,6 @@ require("lazy").setup({
 
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
 			require("mini.surround").setup()
-
-			-- Simple and easy statusline.
-			local statusline = require("mini.statusline")
-			statusline.setup({ use_icons = vim.g.have_nerd_font })
-
-			---@diagnostic disable-next-line: duplicate-set-field
-			statusline.section_location = function()
-				return "%2l:%-2v"
-			end
 		end,
 	},
 	{
@@ -586,18 +609,31 @@ require("lazy").setup({
 		build = ":TSUpdate",
 		config = function()
 			local langs = {
+				"asm",
 				"bash",
 				"c",
+				"cmake",
+				"cpp",
 				"diff",
+				"glsl",
+				"hlsl",
 				"html",
+				"javascript",
+				"json",
 				"lua",
 				"luadoc",
 				"markdown",
 				"markdown_inline",
+				"python",
 				"query",
+				"rust",
+				"toml",
+				"tsx",
+				"typescript",
 				"vim",
 				"vimdoc",
 				"wgsl",
+				"yaml",
 			}
 			require("nvim-treesitter").install(langs)
 			vim.api.nvim_create_autocmd("FileType", {

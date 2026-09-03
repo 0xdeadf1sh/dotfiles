@@ -25,5 +25,3 @@ map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 map("n", "<Tab>", ":bnext<CR>", { silent = true })
 map("n", "<S-Tab>", ":bprevious<CR>", { silent = true })
 
--- Close current buffer
-map("n", "<leader>q", ":Bclose<CR>", { silent = true })

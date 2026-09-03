@@ -3,6 +3,7 @@ vim.deprecate = function() end
 require("user.options")
 require("user.keymaps")
 require("user.lazy")
+require("user.asm").setup()
 
 vim.cmd("colorscheme github_dark_high_contrast")
 

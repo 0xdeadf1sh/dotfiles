@@ -5,6 +5,7 @@ require("user.keymaps")
 require("user.lazy")
 require("user.asm").setup()
 require("user.layout").setup()
+require("user.storage").setup()
 
 vim.cmd("colorscheme github_dark_high_contrast")
 

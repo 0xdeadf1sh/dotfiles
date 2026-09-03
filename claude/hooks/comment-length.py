@@ -3,9 +3,9 @@ import json
 import os
 import sys
 
-MAX_COLS = 80
+MAX_COLS = 100
 MAX_COMMENT_LINES = 1
-MAX_DOCSTRING_LINES = 3
+MAX_DOCSTRING_LINES = 5
 
 C = dict(line=("//",), block=(("/*", "*/"),), strings=('"', "'"))
 LANGS = {

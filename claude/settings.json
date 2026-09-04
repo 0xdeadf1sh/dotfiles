@@ -2,7 +2,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5-1[1m]",
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -27,17 +27,25 @@
     "clangd-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true
   },
+  "feedbackDrafts": "notify",
   "effortLevel": "xhigh",
   "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
+  "askUserQuestionTimeout": "never",
+  "dialogExpiry": "never",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
+  "timeFormat": "auto",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
+  "editorMode": "vim",
   "autoCompactEnabled": false,
   "switchModelsOnFlag": false,
+  "remoteControlAtStartup": true,
+  "crossSessionInbound": "refuse",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true

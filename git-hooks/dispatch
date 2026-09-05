@@ -1,0 +1,12 @@
+#!/bin/sh
+dir=$(dirname "$(readlink -f "$0")")
+name=$(basename "$0")
+if [ -x "$dir/own/$name" ]; then
+    "$dir/own/$name" "$@" || exit $?
+fi
+common=$(git rev-parse --git-common-dir 2>/dev/null) || exit 0
+local_hook="$common/hooks/$name"
+if [ -x "$local_hook" ] && [ "$(readlink -f "$local_hook")" != "$(readlink -f "$0")" ]; then
+    exec "$local_hook" "$@"
+fi
+exit 0

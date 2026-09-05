@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+import re
+import sys
+
+SUBJECT_MAX = 72
+ABBREV = {"e.g.", "i.e.", "etc.", "vs.", "cf.", "approx.", "no.", "ver."}
+TRAILERS = {
+    "co-authored-by", "claude-session", "signed-off-by", "reviewed-by", "acked-by", "tested-by",
+    "reported-by", "suggested-by", "helped-by", "cc", "fixes", "closes", "resolves", "refs",
+    "see-also", "link", "change-id",
+}
+TRAILER_RE = re.compile(r"^([A-Za-z][A-Za-z0-9-]*): \S")
+REVERT_RE = re.compile(r"^This reverts commit [0-9a-f]{7,40}\.$")
+SCISSORS = "------------------------ >8 ------------------------"
+SKIP_LEN = ("fixup! ", "squash! ", "amend! ")
+
+
+def body_lines(path):
+    with open(path, encoding="utf-8", errors="replace") as f:
+        raw = f.read().split("\n")
+    out = []
+    for line in raw:
+        if line.startswith("#"):
+            if SCISSORS in line:
+                break
+            continue
+        out.append(line.rstrip())
+    while out and not out[0]:
+        out.pop(0)
+    while out and not out[-1]:
+        out.pop()
+    return out
+
+
+def sentence_breaks(subject):
+    for m in re.finditer(r"([^\s]+)([.!?;])\s+\S", subject):
+        word = (m.group(1) + m.group(2)).lower()
+        if m.group(2) == "." and word in ABBREV:
+            continue
+        yield m.start(2) + 1
+
+
+def check(lines):
+    errors = []
+    subject = lines[0]
+    if subject.startswith(SKIP_LEN):
+        subject = subject.split(" ", 1)[1]
+    elif len(subject) > SUBJECT_MAX:
+        errors.append(f"subject {len(subject)}/{SUBJECT_MAX} chars")
+    if re.match(r"^[-*+•] ", subject):
+        errors.append("subject is a bullet")
+    for col in sentence_breaks(subject):
+        errors.append(f"subject has a second sentence at column {col}")
+        break
+    if subject.endswith(".") and not subject.endswith("..."):
+        errors.append("subject ends with a period")
+    if len(lines) > 1 and lines[1]:
+        errors.append("line 2: subject must be followed by a blank line")
+    for i, line in enumerate(lines[1:], start=2):
+        if not line or REVERT_RE.match(line):
+            continue
+        m = TRAILER_RE.match(line)
+        if m and m.group(1).lower() in TRAILERS:
+            continue
+        errors.append(f"line {i}: body text not allowed, only the subject and trailers")
+        break
+    return errors
+
+
+def main():
+    lines = body_lines(sys.argv[1])
+    if not lines:
+        return 0
+    errors = check(lines)
+    if not errors:
+        return 0
+    sys.stderr.write("commit-msg: rejected. One sentence, no body.\n")
+    for e in errors:
+        sys.stderr.write(f"  {e}\n")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -5,6 +5,7 @@
 [core]
 	editor = vim
     symlinks = true
+	hooksPath = ~/Desktop/dotfiles/git-hooks
 [init]
 	defaultBranch = main
 [diff]

@@ -1,6 +1,72 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(su:*)",
+      "Bash(doas:*)",
+      "Bash(pkexec:*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf $HOME)",
+      "Bash(rm -rf --no-preserve-root:*)",
+      "Bash(shred:*)",
+      "Bash(wipefs:*)",
+      "Bash(mkfs:*)",
+      "Bash(mkfs.:*)",
+      "Bash(dd if=:*)",
+      "Bash(dd of=/dev/:*)",
+      "Bash(fdisk:*)",
+      "Bash(sfdisk:*)",
+      "Bash(cfdisk:*)",
+      "Bash(gdisk:*)",
+      "Bash(sgdisk:*)",
+      "Bash(parted:*)",
+      "Bash(chmod -R 777 /:*)",
+      "Bash(chown -R:*)",
+      "Bash(chattr:*)",
+      "Bash(truncate -s 0 /:*)",
+      "Bash(shutdown:*)",
+      "Bash(reboot:*)",
+      "Bash(poweroff:*)",
+      "Bash(halt:*)",
+      "Bash(init 0:*)",
+      "Bash(init 6:*)",
+      "Bash(systemctl poweroff:*)",
+      "Bash(systemctl reboot:*)",
+      "Bash(systemctl halt:*)",
+      "Bash(kill -9 -1:*)",
+      "Bash(killall -9:*)",
+      "Bash(crontab -r:*)",
+      "Bash(iptables -F:*)",
+      "Bash(nft flush ruleset:*)",
+      "Bash(ufw disable:*)",
+      "Bash(passwd:*)",
+      "Bash(userdel:*)",
+      "Bash(usermod:*)",
+      "Bash(visudo:*)",
+      "Bash(history -c:*)",
+      "Bash(rm ~/.bash_history:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push origin +:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -f:*)",
+      "Bash(git checkout -- .:*)",
+      "Bash(git restore .:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git stash drop:*)",
+      "Bash(git stash clear:*)",
+      "Bash(git reflog expire:*)",
+      "Bash(git gc --prune=now:*)",
+      "Bash(git filter-branch:*)",
+      "Bash(git update-ref -d:*)",
+      "Bash(cat ~/.claude/.credentials.json:*)",
+      "Bash(cat ~/.ssh/id_:*)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.ssh/**)",
+      "Read(~/.gnupg/**)"
+    ]
   },
   "model": "claude-fable-5-1[1m]",
   "hooks": {
@@ -16,6 +82,16 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/deny-commands.py\"",
+            "timeout": 5
+          }
+        ]
+      },
       {
         "matcher": "Write|Edit|MultiEdit|Bash",
         "hooks": [
@@ -93,5 +169,10 @@
   "crossSessionInbound": "refuse",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    }
+  }
 }

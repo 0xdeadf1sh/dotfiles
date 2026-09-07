@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "auto",
     "deny": [
       "Bash(sudo:*)",
       "Bash(su:*)",
@@ -66,7 +65,8 @@
       "Read(~/.claude/.credentials.json)",
       "Read(~/.ssh/**)",
       "Read(~/.gnupg/**)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "model": "claude-fable-5-1[1m]",
   "hooks": {
@@ -150,6 +150,11 @@
   },
   "feedbackDrafts": "notify",
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "xhigh"
+    }
+  },
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "askUserQuestionTimeout": "never",
@@ -163,16 +168,11 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "vim",
-  "autoCompactEnabled": false,
+  "autoCompactEnabled": true,
   "switchModelsOnFlag": false,
   "remoteControlAtStartup": true,
   "crossSessionInbound": "refuse",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "modelSettings": {
-    "claude-fable-5-1": {
-      "effortLevel": "high"
-    }
-  }
+  "voiceEnabled": true
 }

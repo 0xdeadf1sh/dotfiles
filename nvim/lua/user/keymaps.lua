@@ -24,3 +24,6 @@ map("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 -- Switch buffers
 map("n", "<Tab>", ":bnext<CR>", { silent = true })
 map("n", "<S-Tab>", ":bprevious<CR>", { silent = true })
+
+-- Run lua inside neovim
+map("n", "<space>x", "<cmd>source %<CR>")

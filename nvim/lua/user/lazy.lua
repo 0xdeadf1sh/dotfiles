@@ -470,7 +470,7 @@ require("lazy").setup({
 		init = function()
 			vim.g.llama_config = {
 
-				endpoint_fim = "http://100.76.171.58:6666/infill",
+				endpoint_fim = "http://100.76.171.57:6666/infill",
 				-- endpoint_inst = "http://192.168.10.126:6666/",
 
 				-- Keybindings (FIM)
@@ -499,16 +499,77 @@ require("lazy").setup({
 			"jay-babu/mason-nvim-dap.nvim",
 		},
 		keys = {
-			{ "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "[D]ebug [B]reakpoint" },
-			{ "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Condition: ")) end, desc = "[D]ebug conditional [B]reakpoint" },
-			{ "<leader>dc", function() require("dap").continue() end, desc = "[D]ebug [C]ontinue" },
-			{ "<leader>di", function() require("dap").step_into() end, desc = "[D]ebug step [I]nto" },
-			{ "<leader>do", function() require("dap").step_over() end, desc = "[D]ebug step [O]ver" },
-			{ "<leader>dO", function() require("dap").step_out() end, desc = "[D]ebug step [O]ut" },
-			{ "<leader>dr", function() require("dap").run_last() end, desc = "[D]ebug [R]un last" },
-			{ "<leader>dx", function() require("dap").terminate() end, desc = "[D]ebug terminate" },
-			{ "<leader>du", function() require("dapui").toggle() end, desc = "[D]ebug toggle [U]I" },
-			{ "<leader>de", function() require("dapui").eval() end, mode = { "n", "v" }, desc = "[D]ebug [E]val" },
+			{
+				"<leader>db",
+				function()
+					require("dap").toggle_breakpoint()
+				end,
+				desc = "[D]ebug [B]reakpoint",
+			},
+			{
+				"<leader>dB",
+				function()
+					require("dap").set_breakpoint(vim.fn.input("Condition: "))
+				end,
+				desc = "[D]ebug conditional [B]reakpoint",
+			},
+			{
+				"<leader>dc",
+				function()
+					require("dap").continue()
+				end,
+				desc = "[D]ebug [C]ontinue",
+			},
+			{
+				"<leader>di",
+				function()
+					require("dap").step_into()
+				end,
+				desc = "[D]ebug step [I]nto",
+			},
+			{
+				"<leader>do",
+				function()
+					require("dap").step_over()
+				end,
+				desc = "[D]ebug step [O]ver",
+			},
+			{
+				"<leader>dO",
+				function()
+					require("dap").step_out()
+				end,
+				desc = "[D]ebug step [O]ut",
+			},
+			{
+				"<leader>dr",
+				function()
+					require("dap").run_last()
+				end,
+				desc = "[D]ebug [R]un last",
+			},
+			{
+				"<leader>dx",
+				function()
+					require("dap").terminate()
+				end,
+				desc = "[D]ebug terminate",
+			},
+			{
+				"<leader>du",
+				function()
+					require("dapui").toggle()
+				end,
+				desc = "[D]ebug toggle [U]I",
+			},
+			{
+				"<leader>de",
+				function()
+					require("dapui").eval()
+				end,
+				mode = { "n", "v" },
+				desc = "[D]ebug [E]val",
+			},
 		},
 		config = function()
 			local dap, dapui = require("dap"), require("dapui")
@@ -565,8 +626,20 @@ require("lazy").setup({
 		"MagicDuck/grug-far.nvim",
 		cmd = "GrugFar",
 		keys = {
-			{ "<leader>sR", function() require("grug-far").open() end, desc = "[S]earch and [R]eplace" },
-			{ "<leader>sW", function() require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } }) end, desc = "Replace [W]ord under cursor" },
+			{
+				"<leader>sR",
+				function()
+					require("grug-far").open()
+				end,
+				desc = "[S]earch and [R]eplace",
+			},
+			{
+				"<leader>sW",
+				function()
+					require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
+				end,
+				desc = "Replace [W]ord under cursor",
+			},
 		},
 		opts = {},
 	},

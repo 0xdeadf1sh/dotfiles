@@ -74,6 +74,8 @@ files until I have answered.
 Write in plain language. Keep every answer as short as it can be while
 still being correct and complete.
 
+The `mad-max` skill wins over this section wherever the two conflict.
+
 - **Common words.** Use the plainest word that is exact. No literary or
   rare vocabulary. If a short word works, use it.
 - **Short sentences.** One idea per sentence. Cut clauses that add no

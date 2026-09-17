@@ -17,32 +17,54 @@ local function find_up(from, name)
 	return vim.fs.find(name, { path = from, upward = true, type = "file" })[1]
 end
 
+local x86 = {}
+
+--- asks the compiler, not the host: a cross gcc for xtensa rejects -masm=intel on an x86 box too
+local function targets_x86(probe, cwd)
+	local key = probe[1] or ""
+	if x86[key] == nil then
+		local ok, res = pcall(function()
+			return vim.system(probe, { cwd = cwd, text = true }):wait()
+		end)
+		local out = ok and res.code == 0 and res.stdout or ""
+		x86[key] = out:find("x86") ~= nil or out:find("i%d86") ~= nil
+	end
+	return x86[key]
+end
+
 ---@return string[] argv, string cwd, string? outfile
 local function build(path, ft, level)
 	if ft == "rust" then
 		local out = vim.fn.tempname() .. ".s"
 		local cargo = find_up(vim.fs.dirname(path), "Cargo.toml")
+		local cwd = vim.fs.dirname(cargo or path)
 		local flags = {
 			"--emit",
 			"asm=" .. out,
 			"-Cdebuginfo=2",
 			"-Ccodegen-units=1",
 			"-Copt-level=" .. level,
-			RUSTC_INTEL,
 		}
+		if targets_x86({ "rustc", "--print", "cfg" }, cwd) then
+			flags[#flags + 1] = RUSTC_INTEL
+		end
 		if cargo then
 			local argv = { "cargo", "rustc", "--quiet", "--" }
 			vim.list_extend(argv, flags)
-			return argv, vim.fs.dirname(cargo), out
+			return argv, cwd, out
 		end
 		local argv = { "rustc", "--crate-type=lib" }
 		vim.list_extend(argv, flags)
 		argv[#argv + 1] = path
-		return argv, vim.fs.dirname(path), out
+		return argv, cwd, out
 	end
 
 	local argv, cwd = cc.base(path, ft)
-	vim.list_extend(argv, { "-S", "-g", "-O" .. level, "-masm=intel", "-o", "-" })
+	vim.list_extend(argv, { "-S", "-g", "-O" .. level })
+	if targets_x86({ argv[1], "-dumpmachine" }, cwd) then
+		argv[#argv + 1] = "-masm=intel"
+	end
+	vim.list_extend(argv, { "-o", "-" })
 	return argv, cwd, nil
 end
 

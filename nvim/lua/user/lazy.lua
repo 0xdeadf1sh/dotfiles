@@ -307,25 +307,27 @@ require("lazy").setup({
 				settings = { Lua = { completion = { callSnippet = "Replace" } } },
 			})
 
-			require("mason-tool-installer").setup({
-				ensure_installed = {
-					"asm_lsp",
-					"clangd",
-					"lua_ls",
-					"ruff",
-					"wgsl_analyzer",
-					"rust_analyzer",
-					"ts_ls",
-					"stylua",
-				},
-			})
+			local tools = {
+				"asm_lsp",
+				"lua_ls",
+				"ruff",
+				"wgsl_analyzer",
+				"rust_analyzer",
+				"ts_ls",
+				"stylua",
+			}
+			-- Mason ships clangd for x86_64 Linux only; other hosts run the system clangd
+			if vim.uv.os_uname().machine == "x86_64" then
+				tools[#tools + 1] = "clangd"
+			end
+			require("mason-tool-installer").setup({ ensure_installed = tools })
 
 			-- rustaceanvim and typescript-tools start their own clients for the first two
 			require("mason-lspconfig").setup({
 				automatic_enable = { exclude = { "rust_analyzer", "ts_ls", "pyright" } },
 			})
 
-			vim.lsp.enable("wgsl_analyzer")
+			vim.lsp.enable({ "clangd", "wgsl_analyzer" })
 		end,
 	},
 

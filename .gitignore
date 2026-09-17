@@ -4,3 +4,6 @@
 
 # cache
 __pycache__
+
+# claude.ai synced skills
+claude/skills/synced/

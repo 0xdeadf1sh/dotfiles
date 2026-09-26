@@ -51,12 +51,14 @@ export EDITOR=vim
 export VISUAL=view
 export PAGER=less
 
-# nice-looking prompt
+# nice-looking prompt, led by the BG reading where t1dmkd (T1DMKDE) runs, else a penguin
+mark='$(command -v t1dmkd >/dev/null && t1dmkd prompt 2>/dev/null || printf "🐧")'
 if [ $USER == "root" ]; then
-    export PS1="🐧 [\[\033[1;31m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
+    export PS1="$mark [\[\033[1;31m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
 else
-    export PS1="🐧 [\[\033[1;32m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
+    export PS1="$mark [\[\033[1;32m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
 fi
+unset mark
 
 # fix git's gpg signing problem
 export GPG_TTY=$(tty)

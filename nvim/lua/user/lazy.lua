@@ -467,30 +467,30 @@ require("lazy").setup({
 		end,
 	},
 
-	{
-		"ggml-org/llama.vim",
-		init = function()
-			vim.g.llama_config = {
-
-				endpoint_fim = "http://100.76.171.57:6666/infill",
-				-- endpoint_inst = "http://192.168.10.126:6666/",
-
-				-- Keybindings (FIM)
-				keymap_fim_accept_full = "<C-y>",
-				keymap_fim_accept_line = "<C-l>",
-				keymap_fim_accept_word = "<Nop>",
-				keymap_fim_trigger = "<Nop>",
-
-				-- Keybindings (Instruction)
-				keymap_inst_accept = "<Nop>",
-				keymap_inst_cancel = "<Nop>",
-				keymap_inst_trigger = "<Nop>",
-
-				-- Disable verbose logging
-				show_info = 0,
-			}
-		end,
-	},
+	-- {
+	-- 	"ggml-org/llama.vim",
+	-- 	init = function()
+	-- 		vim.g.llama_config = {
+	--
+	-- 			endpoint_fim = "http://100.76.171.57:6666/infill",
+	-- 			-- endpoint_inst = "http://192.168.10.126:6666/",
+	--
+	-- 			-- Keybindings (FIM)
+	-- 			keymap_fim_accept_full = "<C-y>",
+	-- 			keymap_fim_accept_line = "<C-l>",
+	-- 			keymap_fim_accept_word = "<Nop>",
+	-- 			keymap_fim_trigger = "<Nop>",
+	--
+	-- 			-- Keybindings (Instruction)
+	-- 			keymap_inst_accept = "<Nop>",
+	-- 			keymap_inst_cancel = "<Nop>",
+	-- 			keymap_inst_trigger = "<Nop>",
+	--
+	-- 			-- Disable verbose logging
+	-- 			show_info = 0,
+	-- 		}
+	-- 	end,
+	-- },
 
 	{
 		"mfussenegger/nvim-dap",
@@ -651,13 +651,15 @@ require("lazy").setup({
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		opts = {
-			theme = "github-theme",
-			sections = {
-				lualine_c = { "filename", { vim.lsp.status } },
-				lualine_z = { "%2l:%-2v" },
-			},
-		},
+		opts = function()
+			return {
+				sections = {
+					lualine_c = { "filename", { vim.lsp.status } },
+					lualine_x = { { require("user.glucose") }, "encoding", "fileformat", "filetype" },
+					lualine_z = { "%2l:%-2v" },
+				},
+			}
+		end,
 	},
 
 	-- Highlight todo, notes, etc in comments

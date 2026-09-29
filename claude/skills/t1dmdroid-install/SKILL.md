@@ -102,3 +102,12 @@ adb shell dumpsys package com.t1dm.app </dev/null | grep -m1 versionName
 ```
 
 HyperOS install traps: `android-device-testing`.
+
+## On-screen review is the user's
+
+The install ends at the checks above. The user reviews the screen on the phone.
+
+- No `input tap`, `input swipe` or `input keyevent` to reach a screen. A tap on the dashboard's sensor
+  name switched the live CGM view to another sensor.
+- Checks that change nothing are fine: logcat, `dumpsys`, tests, `uiautomator dump`, `screencap`.
+- If only the screen shows the result, name the screen and the row to check, then stop.

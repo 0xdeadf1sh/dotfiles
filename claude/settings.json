@@ -156,6 +156,9 @@
     },
     "claude-opus-5": {
       "effortLevel": "xhigh"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
     }
   },
   "promptSuggestionEnabled": false,
@@ -174,7 +177,7 @@
   "autoCompactEnabled": true,
   "switchModelsOnFlag": false,
   "remoteControlAtStartup": true,
-  "crossSessionInbound": "refuse",
+  "crossSessionInbound": "hold",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true

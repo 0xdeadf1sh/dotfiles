@@ -36,6 +36,7 @@ PLUG_ICON   = "🔌"
 MEM_ICON    = "🧠"
 SKILL_ICON  = "🧰"
 CTX_ICON    = "📊"
+BG_ICON     = "🩸"
 
 CONTEXT_WINDOW = 1_000_000
 
@@ -139,6 +140,18 @@ def detect_provider() -> tuple[str, str, str]:
     if (Path.home() / ".claude" / ".credentials.json").is_file():
         return SUB_ICON, "Subscription", "\x1b[1;38;5;213m"
     return SUB_ICON, "Subscription", "\x1b[1;38;5;213m"
+
+
+def glucose() -> str | None:
+    """`t1dmkd prompt` without its readline \\x01 \\x02 fences, or None."""
+    try:
+        r = subprocess.run(["t1dmkd", "prompt"],
+                           capture_output=True, text=True, timeout=0.5)
+    except Exception:
+        return None
+    if r.returncode != 0 or not r.stdout:
+        return None
+    return r.stdout.translate({1: None, 2: None})
 
 
 def count_memories(cwd: str) -> int:
@@ -366,7 +379,6 @@ def main() -> None:
     dirname = Path(cwd).name or cwd
     branch = git_branch(cwd)
     distro = detect_distro()
-    prov_icon, prov_label, prov_color = detect_provider()
 
     sep = f"{DIM}{GRAY} · {RESET}"
     parts = [f"{BOLD}{GREEN}{USER_ICON}  {user}{RESET}"]
@@ -380,7 +392,12 @@ def main() -> None:
     effort = (data.get("effort") or {}).get("level")
     if effort:
         parts.append(f"{BOLD}{effort_color(effort)}{EFFORT_ICON}  {effort}{RESET}")
-    parts.append(f"{BOLD}{prov_color}{prov_icon}  {prov_label}{RESET}")
+    bg = glucose()
+    if bg:
+        parts.append(f"{BG_ICON}  {bg}{RESET}")
+    else:
+        prov_icon, prov_label, prov_color = detect_provider()
+        parts.append(f"{BOLD}{prov_color}{prov_icon}  {prov_label}{RESET}")
 
     mem_n = count_memories(cwd)
     skill_n = count_skills(cwd)

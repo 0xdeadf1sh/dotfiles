@@ -1,61 +1,85 @@
 #!/usr/bin/env python3
-"""Rich animated statusline for Claude Code.
-
-Reads the statusline JSON event on stdin and emits a single ANSI-decorated line.
-Pulls live context usage from the transcript JSONL, then fills the remaining
-terminal width with a Matrix code stream, lit up to the context-usage mark. The
-animation advances each time Claude Code redraws the statusline (typing,
-tool calls, response chunks); there is no background tick.
-"""
+"""Claude Code statusline: `label:value` segments, ending in a context-usage bar."""
 from __future__ import annotations
-import json, os, sys, subprocess, math, time, re, shutil, unicodedata
+import json, os, sys, subprocess, re, shutil, unicodedata
 from pathlib import Path
 
-# --- ANSI ---------------------------------------------------------------
 RESET  = "\033[0m"
 BOLD   = "\033[1m"
-DIM    = "\033[2m"
 WHITE  = "\033[38;5;231m"
 GREEN  = "\033[38;5;46m"
-CYAN   = "\033[38;5;40m"
+LIME   = "\033[38;5;120m"
 YELLOW = "\033[38;5;184m"
-PURPLE = "\033[38;5;34m"
-GRAY   = "\033[38;5;22m"
+MID    = "\033[38;5;34m"
+DARK   = "\033[38;5;28m"
 RED    = "\033[38;5;196m"
 
-# Halfwidth katakana: 1 cell, like ASCII.
-USER_ICON   = "ﾕ"
-DISTRO_ICON = "ｼ"
-DIR_ICON    = "ﾃ"
-GIT_ICON    = "⌥"
-MODEL_ICON  = "ﾓ"
-EFFORT_ICON = "ﾘ"
-SUB_ICON    = "ﾌ"
-API_ICON    = "ﾌ"
-CLOUD_ICON  = "ﾌ"
-PLUG_ICON   = "ﾌ"
-MEM_ICON    = "ｷ"
-SKILL_ICON  = "ｽ"
-CTX_ICON    = "ｺ"
-BG_ICON     = "ﾁ"
+LABEL = MID
+VALUE = LIME
 
 CONTEXT_WINDOW = 1_000_000
-
+MIN_BAR_WIDTH = 10
+# Claude Code's TUI reserves a few right-edge cells; without this margin the line becomes "…".
+SAFETY = 4
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 
 def visible_len(s: str) -> int:
-    """Display-cell width of `s`, ignoring ANSI escapes and counting
-    East-Asian wide / fullwidth glyphs (incl. most emoji) as 2 cells."""
-    plain = ANSI_RE.sub("", s)
-    n = 0
-    for ch in plain:
-        if unicodedata.east_asian_width(ch) in ("W", "F"):
-            n += 2
+    return sum(2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
+               for ch in ANSI_RE.sub("", s))
+
+
+def _ioctl_cols(target) -> int | None:
+    try:
+        import fcntl, struct, termios
+        if isinstance(target, str):
+            with open(target, "rb") as t:
+                raw = fcntl.ioctl(t, termios.TIOCGWINSZ, b"\0" * 8)
         else:
-            n += 1
-    return n
+            raw = fcntl.ioctl(target, termios.TIOCGWINSZ, b"\0" * 8)
+        _, cols, _, _ = struct.unpack("hhhh", raw)
+        return cols if cols > 0 else None
+    except Exception:
+        return None
+
+
+def _ancestor_ttys():
+    """Yield ttys open on fds 0-2 of us or any ancestor; Claude Code pipes our stdio."""
+    seen = set()
+    pid = os.getpid()
+    for _ in range(20):
+        for fd in (0, 1, 2):
+            try:
+                tgt = os.readlink(f"/proc/{pid}/fd/{fd}")
+            except Exception:
+                continue
+            if tgt not in seen and ("/dev/pts/" in tgt or tgt.startswith("/dev/tty")):
+                seen.add(tgt)
+                yield tgt
+        try:
+            with open(f"/proc/{pid}/stat", "rb") as f:
+                line = f.read().decode("latin-1")
+            ppid = int(line[line.rfind(")") + 2:].split()[1])
+        except Exception:
+            break
+        if ppid <= 1 or ppid == pid:
+            break
+        pid = ppid
+
+
+def term_width(data: dict) -> int:
+    w = data.get("terminal_width") or data.get("term_width")
+    if isinstance(w, int) and w > 0:
+        return w
+    for target in ("/dev/tty", 0, 1, 2, *_ancestor_ttys()):
+        cols = _ioctl_cols(target)
+        if cols:
+            return cols
+    env = os.environ.get("COLUMNS")
+    if env and env.isdigit():
+        return int(env)
+    return shutil.get_terminal_size((120, 24)).columns
 
 
 def read_input() -> dict:
@@ -121,8 +145,7 @@ def detect_distro() -> str | None:
     return None
 
 
-def detect_provider() -> tuple[str, str, str]:
-    """Return (icon, label, ansi_color) for how Claude Code is connected."""
+def detect_provider() -> str:
     base = os.environ.get("ANTHROPIC_BASE_URL", "").strip()
     if base:
         from urllib.parse import urlparse
@@ -131,14 +154,14 @@ def detect_provider() -> tuple[str, str, str]:
         except Exception:
             host = base
         if host and "anthropic.com" not in host.lower():
-            return PLUG_ICON, host, CYAN
+            return host
     if os.environ.get("CLAUDE_CODE_USE_BEDROCK"):
-        return CLOUD_ICON, "Bedrock", CYAN
+        return "bedrock"
     if os.environ.get("CLAUDE_CODE_USE_VERTEX"):
-        return CLOUD_ICON, "Vertex", CYAN
+        return "vertex"
     if os.environ.get("ANTHROPIC_API_KEY"):
-        return API_ICON, "API", CYAN
-    return SUB_ICON, "Subscription", CYAN
+        return "api"
+    return "sub"
 
 
 def glucose() -> str | None:
@@ -199,208 +222,64 @@ def ctx_color(pct: float) -> str:
 
 
 EFFORT_COLORS = {
-    "low":    GRAY,
-    "medium": PURPLE,
-    "high":   CYAN,
+    "low":    DARK,
+    "medium": MID,
+    "high":   LIME,
     "xhigh":  GREEN,
     "max":    WHITE,
 }
 
 
-def effort_color(level: str) -> str:
-    return EFFORT_COLORS.get(level, GRAY)
+def bar(pct: float, color: str, width: int) -> str:
+    filled = int(round(max(0.0, min(100.0, pct)) / 100.0 * width))
+    return f"{color}{'▰' * filled}{DARK}{'▱' * (width - filled)}{RESET}"
 
 
-# --- Matrix stream ------------------------------------------------------
-
-STATE_FILE = Path.home() / ".claude" / ".statusline-matrix.state"
-
-
-def next_frame() -> int:
-    """Persistent monotonic counter — one increment per statusline redraw.
-
-    The statusline hook does not fire on a timer; it fires on discrete events.
-    Driving the animation off wall-clock time means most "frames" are skipped.
-    Driving it off this counter means each redraw advances the rain one step.
-    """
-    try:
-        n = int(STATE_FILE.read_text().strip())
-    except Exception:
-        n = 0
-    n = (n + 1) & 0x7FFFFFFF
-    try:
-        STATE_FILE.write_text(str(n))
-    except Exception:
-        pass
-    return n
-
-# Every glyph must be 1 cell wide, or the line overruns SAFETY and gets truncated.
-GLYPHS = ("ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"
-          "0123456789Z:.=*+-<>¦")
-RAIN_HEAD   = f"{BOLD}{WHITE}"
-RAIN_BRIGHT = f"{BOLD}{GREEN}"
-RAIN_PERIOD = 14
-
-
-def _hash(a: int, b: int) -> int:
-    h = (a * 0x9E3779B1 ^ b * 0x85EBCA77) & 0xFFFFFFFF
-    h ^= h >> 15
-    h = (h * 0x2C1B3C6D) & 0xFFFFFFFF
-    return h ^ (h >> 12)
-
-
-def matrix_fill(width: int, pct: float, frame: int) -> str:
-    """Cells before the `pct` mark rain at full density; cells after it
-    flicker sparsely in the darkest green."""
-    if width <= 0:
-        return ""
-    mark = int(round(max(0.0, min(100.0, pct)) / 100.0 * (width - 1)))
-    out = []
-    for i in range(width):
-        phase = (frame + _hash(i, 0)) % RAIN_PERIOD
-        glyph = GLYPHS[_hash(i, frame) % len(GLYPHS)]
-        if i == mark:
-            out.append(f"{RESET}{RAIN_HEAD}{glyph}")
-        elif i < mark:
-            col = (RAIN_HEAD if phase == 0 else RAIN_BRIGHT if phase < 4
-                   else PURPLE if phase < 9 else GRAY)
-            out.append(f"{RESET}{col}{glyph}")
-        else:
-            out.append(f"{RESET}{GRAY}{glyph}" if phase < 2 else " ")
-    return "".join(out) + RESET
-
-
-def _ioctl_cols(target) -> int | None:
-    """Return columns from a TIOCGWINSZ ioctl on an open fd or path."""
-    try:
-        import fcntl, struct, termios
-        if isinstance(target, str):
-            with open(target, "rb") as t:
-                raw = fcntl.ioctl(t, termios.TIOCGWINSZ, b"\0" * 8)
-        else:
-            raw = fcntl.ioctl(target, termios.TIOCGWINSZ, b"\0" * 8)
-        _, cols, _, _ = struct.unpack("hhhh", raw)
-        return cols if cols > 0 else None
-    except Exception:
-        return None
-
-
-def _walk_proc_ttys():
-    """Yield pts/tty device paths held open by us or any ancestor."""
-    seen = set()
-    pid = os.getpid()
-    for _ in range(20):  # depth limit
-        for fd in (0, 1, 2):
-            try:
-                tgt = os.readlink(f"/proc/{pid}/fd/{fd}")
-            except Exception:
-                continue
-            if tgt in seen:
-                continue
-            seen.add(tgt)
-            if "/dev/pts/" in tgt or tgt.startswith("/dev/tty"):
-                yield tgt
-        try:
-            with open(f"/proc/{pid}/stat", "rb") as f:
-                # stat format: pid (comm) state ppid ...
-                # comm can contain spaces/parens — find last ')'.
-                line = f.read().decode("latin-1")
-                rparen = line.rfind(")")
-                fields = line[rparen + 2:].split()
-                ppid = int(fields[1])  # field index after state
-        except Exception:
-            break
-        if ppid <= 1 or ppid == pid:
-            break
-        pid = ppid
-
-
-def term_width(data: dict) -> tuple[int, str]:
-    """Return (cols, source) — source identifies which fallback resolved."""
-    # 1. Claude Code's JSON payload (if it ever exposes width).
-    w = data.get("terminal_width") or data.get("term_width")
-    if isinstance(w, int) and w > 0:
-        return w, "json"
-    # 2. ioctl on /dev/tty.
-    cols = _ioctl_cols("/dev/tty")
-    if cols:
-        return cols, "/dev/tty"
-    # 3. ioctl on our own std fds.
-    for fd in (0, 1, 2):
-        cols = _ioctl_cols(fd)
-        if cols:
-            return cols, f"fd:{fd}"
-    # 4. Walk the parent chain — find any ancestor that has a /dev/pts/* open.
-    for path in _walk_proc_ttys():
-        cols = _ioctl_cols(path)
-        if cols:
-            return cols, f"proc:{path}"
-    # 5. $COLUMNS env.
-    env = os.environ.get("COLUMNS")
-    if env and env.isdigit():
-        return int(env), "$COLUMNS"
-    # 6. Last resort.
-    try:
-        return shutil.get_terminal_size((120, 24)).columns, "shutil"
-    except Exception:
-        return 120, "default"
+def seg(label: str, value: str, color: str = VALUE) -> str:
+    return f"{LABEL}{label}:{RESET}{color}{value}{RESET}"
 
 
 def main() -> None:
     data = read_input()
     cwd = (data.get("workspace") or {}).get("current_dir") or data.get("cwd") or os.getcwd()
-    model = data.get("model") or {}
-    model_name = model.get("display_name") or ""
+    model_name = (data.get("model") or {}).get("display_name") or ""
     transcript = data.get("transcript_path") or ""
 
     user = os.environ.get("USER") or os.environ.get("LOGNAME") or "user"
-    dirname = Path(cwd).name or cwd
     branch = git_branch(cwd)
     distro = detect_distro()
 
-    sep = f"{GRAY} │ {RESET}"
-    parts = [f"{BOLD}{GREEN}{USER_ICON} {user}{RESET}"]
+    parts = [seg("uid", user)]
     if distro:
-        parts.append(f"{BOLD}{CYAN}{DISTRO_ICON} {distro}{RESET}")
-    parts.append(f"{BOLD}{CYAN}{DIR_ICON} {dirname}{RESET}")
+        parts.append(seg("os", distro))
+    parts.append(seg("cwd", Path(cwd).name or cwd, f"{BOLD}{WHITE}"))
     if branch:
-        parts.append(f"{BOLD}{GREEN}{GIT_ICON} {branch}{RESET}")
+        parts.append(seg("ref", branch))
     if model_name:
-        parts.append(f"{BOLD}{PURPLE}{MODEL_ICON} {model_name}{RESET}")
+        parts.append(seg("llm", model_name))
     effort = (data.get("effort") or {}).get("level")
     if effort:
-        parts.append(f"{BOLD}{effort_color(effort)}{EFFORT_ICON} {effort}{RESET}")
+        parts.append(seg("nice", effort, EFFORT_COLORS.get(effort, VALUE)))
     bg = glucose()
     if bg:
-        parts.append(f"{BOLD}{GREEN}{BG_ICON}{RESET} {bg}{RESET}")
+        parts.append(f"{LABEL}bg:{RESET}{bg}{RESET}")
     else:
-        prov_icon, prov_label, prov_color = detect_provider()
-        parts.append(f"{BOLD}{prov_color}{prov_icon} {prov_label}{RESET}")
+        parts.append(seg("link", detect_provider()))
+    parts.append(seg("mem", str(count_memories(cwd))))
+    parts.append(seg("lib", str(count_skills(cwd))))
 
-    mem_n = count_memories(cwd)
-    skill_n = count_skills(cwd)
-    parts.append(f"{BOLD}{PURPLE}{MEM_ICON} {mem_n}{RESET}")
-    parts.append(f"{BOLD}{CYAN}{SKILL_ICON} {skill_n}{RESET}")
-
+    sep = f"{DARK} | {RESET}"
     used = context_tokens(transcript)
-    window = CONTEXT_WINDOW
-    pct = (used / window * 100) if used is not None else 0.0
     if used is not None:
+        pct = used / CONTEXT_WINDOW * 100
         col = ctx_color(pct)
-        parts.append(
-            f"{BOLD}{col}{CTX_ICON} {fmt_tokens(used)}/{fmt_tokens(window)} "
-            f"({pct:.0f}%){RESET}"
-        )
+        head = f"{LABEL}ctx:{RESET}"
+        tail = f" {col}{fmt_tokens(used)}/{fmt_tokens(CONTEXT_WINDOW)} {pct:.0f}%{RESET}"
+        taken = visible_len(sep.join(parts + [head + tail]))
+        width = max(MIN_BAR_WIDTH, term_width(data) - taken - SAFETY)
+        parts.append(head + bar(pct, col, width) + tail)
 
-    content = sep.join(parts)
-    width, _src = term_width(data)
-    # Claude Code's TUI reserves a few right-edge cells for its own chrome /
-    # overflow indicator. Without this margin the line is truncated to "…".
-    SAFETY = 4
-    GAP = 1
-    fill_w = max(0, width - visible_len(content) - GAP - SAFETY)
-    fill = matrix_fill(fill_w, pct, next_frame())
-    sys.stdout.write(content + (" " * GAP) + fill)
+    sys.stdout.write(sep.join(parts))
 
 
 if __name__ == "__main__":

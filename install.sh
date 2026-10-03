@@ -51,6 +51,9 @@ if command -v chromium >/dev/null; then
     sed -i '\|chromium/matrix-theme|d' "$flags"
     printf -- '--load-extension=%q\n' "$d/chromium/matrix-theme" >>"$flags"
 fi
+if command -v Telegram >/dev/null || command -v telegram-desktop >/dev/null; then
+    echo "Telegram: open $d/telegram/matrix.tdesktop-theme in a chat and tap Apply"
+fi
 for f in CLAUDE.md settings.json statusline-command.sh hooks skills; do
     link "$d/claude/$f" ~/.claude/$f
 done

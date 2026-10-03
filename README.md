@@ -21,6 +21,7 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `firefox/{user.js,chrome}` | each install's default profile in `profiles.ini` |
 | `chromium/matrix-theme/` | `--load-extension` line in `~/.config/chromium-flags.conf` |
 | `darkreader/matrix.json` | none; imported by hand in Dark Reader |
+| `telegram/matrix.tdesktop-theme` | none; applied by hand in Telegram Desktop |
 
 The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path for `core.hooksPath`.
 
@@ -97,6 +98,13 @@ The first Neovim start installs plugins, treesitter parsers and Mason tools.
 - Dark Reader: Settings → Advanced → Import Settings → `darkreader/matrix.json`, once per browser. The
   file sets the theme colors and turns off dark-site detection, so sites with their own dark theme also
   get the matrix colors; site lists stay as they are.
+
+## Telegram
+
+`telegram/matrix.tdesktop-theme` is applied by sending it to any chat (Saved Messages works), clicking
+it and choosing Apply. `telegram/build.py` regenerates it: it fetches Telegram's default palette and
+night theme, recolors neutral and blue entries to green by luminance, keeps other hues, maps the
+night background and anything darker to `#000000`, and uses a solid black chat background.
 
 ## console colors
 

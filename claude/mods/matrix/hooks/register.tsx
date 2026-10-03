@@ -1,10 +1,16 @@
+import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
+import { agentInput, SPIN, tallyLine } from './agents'
 import { parse, tableLines, type Span } from './markdown'
 import { LIME, Rain } from './rain'
 
 const BAND_ROWS = 3
 const FRAME_MS = 83
+const SPIN_MS = 100
+
+const tallies = atom({ plugin: 'matrix', key: 'tallies' } as const, {})
+const frame = atom({ plugin: 'matrix', key: 'frame' } as const, 0)
 
 const GREEN = {
   heading: LIME,
@@ -18,6 +24,8 @@ const GREEN = {
 export const register: Register = on => {
   let rain: Rain | undefined
   let bandId: string | undefined
+  let runningAgents = 0
+  const agentCall = new Map<string, string>()
 
   on('session.start', ($, e, next) => {
     $.clock.every(FRAME_MS, () => {
@@ -25,7 +33,66 @@ export const register: Register = on => {
       rain.step()
       void $.ui.blit({ requestId: bandId, key: 'rain', cells: rain.cells() })
     })
+    $.clock.every(SPIN_MS, () => {
+      if (runningAgents > 0) void update($, frame, f => (f + 1) % SPIN.length)
+    })
     return next(e)
+  })
+
+  on('agent.spawn', async (_$, e, next) => {
+    const started = await next(e)
+    if (started.agentId !== undefined) agentCall.set(started.agentId, e.tool_use_id)
+    return started
+  })
+
+  on('tool.call', async ($, e, next) => {
+    const owner = e.agentId === undefined ? undefined : agentCall.get(e.agentId)
+    if (owner !== undefined) {
+      await update($, tallies, t => ({ ...t, [owner]: { ...t[owner], [e.tool]: (t[owner]?.[e.tool] ?? 0) + 1 } }))
+    }
+    if (e.tool !== 'Agent') return next(e)
+    runningAgents++
+    try {
+      return await next(e)
+    } finally {
+      runningAgents--
+    }
+  })
+
+  on('ui.render', { component: 'ToolUse', props: { tool: 'Agent' } }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const { type, description } = agentInput(e.props.input)
+    const tally = tallyLine((await read($, tallies))[e.props.tool_use_id])
+    const mark = e.props.isRunning
+      ? <Text color={LIME}>{SPIN[await read($, frame)]}</Text>
+      : e.props.isInterrupted
+        ? <Text color={GREEN.dim}>⊘</Text>
+        : e.props.isErrored
+          ? <Text color="#ff3b3b">✗</Text>
+          : <Text color={LIME}>✓</Text>
+    return (
+      <Box flexDirection="row">
+        {mark}
+        <Text wrap="truncate-end">
+          <Text color={LIME} bold>{' ' + type}</Text>
+          <Text color={GREEN.dim}>{' ▸ '}</Text>
+          <Text color={GREEN.body}>{description}</Text>
+          {tally !== '' && <Text color={GREEN.dim}>{'  ' + tally}</Text>}
+          {e.props.isInterrupted && <Text color={GREEN.dim}>{'  interrupted'}</Text>}
+        </Text>
+      </Box>
+    )
+  })
+
+  on('ui.render', { component: 'PromptHint' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text color={GREEN.dim} wrap="truncate-end">{e.props.hint}</Text>
+  })
+
+  on('ui.render', { component: 'SessionMode' }, ($, e, next) => {
+    if (e.props.modes.length === 0) return next(e)
+    const { Text } = $.ui.resolve(e)
+    return <Text color={LIME} wrap="truncate-end">{e.props.modes.join(' · ')}</Text>
   })
 
   on('ui.render', { component: 'AbovePrompt' }, ($, e, next) => {

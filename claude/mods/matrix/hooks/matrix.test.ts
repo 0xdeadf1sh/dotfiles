@@ -1,5 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
+import { agentInput, tallyLine } from './agents'
 import { parse, plain, tableLines } from './markdown'
 import { base64, Rain } from './rain'
 
@@ -75,4 +76,53 @@ test('the band draws a 3-row Raster as wide as the band', async $ => {
   })
   const raster = await band.find({ type: 'Raster', key: 'rain' })
   expect(raster?.props).toMatchObject({ columns: 40, rows: 3 })
+})
+
+test('agentInput falls back on missing fields', () => {
+  expect(agentInput({ subagent_type: 'Explore', description: 'find x' })).toEqual({ type: 'Explore', description: 'find x' })
+  expect(agentInput(null)).toEqual({ type: 'general-purpose', description: '' })
+})
+
+test('tallyLine orders tools by count', () => {
+  expect(tallyLine({ Bash: 1, Read: 3 })).toBe('Read×3 Bash×1')
+  expect(tallyLine(undefined)).toBe('')
+})
+
+test('a finished Agent row draws type, description and a check', async $ => {
+  const row = await $.ui.mount({
+    plugin: 'matrix',
+    surface: 'terminal',
+    component: 'ToolUse',
+    props: {
+      tool_use_id: 't1',
+      tool: 'Agent',
+      input: { subagent_type: 'Explore', description: 'find x', prompt: 'p' },
+      isRunning: false,
+      isErrored: false,
+      isInterrupted: false,
+    },
+  })
+  expect(await row.find({ type: 'Text', text: /^✓$/ })).toBeDefined()
+  expect((await row.find({ type: 'Text', text: /^ Explore$/ }))?.props).toMatchObject({ color: '#00ff41' })
+  expect(await row.find({ type: 'Text', text: /^find x$/ })).toBeDefined()
+})
+
+test('the hint keeps its text in dim green', async $ => {
+  const hint = await $.ui.mount({
+    plugin: 'matrix',
+    surface: 'terminal',
+    component: 'PromptHint',
+    props: { isDraft: false, isWorking: false, hint: '? for shortcuts' },
+  })
+  expect((await hint.find({ type: 'Text', text: /^\? for shortcuts$/ }))?.props).toMatchObject({ color: '#2e7d32' })
+})
+
+test('mode labels draw lime, joined', async $ => {
+  const modes = await $.ui.mount({
+    plugin: 'matrix',
+    surface: 'terminal',
+    component: 'SessionMode',
+    props: { modes: ['auto mode on', 'fast'] },
+  })
+  expect((await modes.find({ type: 'Text', text: /^auto mode on · fast$/ }))?.props).toMatchObject({ color: '#00ff41' })
 })

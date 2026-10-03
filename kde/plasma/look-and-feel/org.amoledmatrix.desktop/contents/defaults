@@ -4,6 +4,9 @@ widgetStyle=Breeze
 [kdeglobals][General]
 ColorScheme=AmoledMatrix
 
+[kdeglobals][Icons]
+Theme=AmoledMatrix
+
 [plasmarc][Theme]
 name=amoled-matrix
 

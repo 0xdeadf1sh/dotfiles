@@ -1,1 +1,43 @@
-../dialogs/background.svg
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 40 60">
+  <style id="current-color-scheme" type="text/css">
+    .ColorScheme-Background { color:#000000; }
+    .ColorScheme-Highlight { color:#00ff66; }
+  </style>
+  <g id="topleft">
+    <path class="ColorScheme-Highlight" fill="currentColor" d="M0 8V6a6 6 0 0 1 6-6h2v8z"/>
+    <path class="ColorScheme-Background" fill="currentColor" d="M1 8V6a5 5 0 0 1 5-5h2v7z"/>
+  </g>
+  <g id="top">
+    <rect class="ColorScheme-Highlight" fill="currentColor" x="8" y="0" width="24" height="1"/>
+    <rect class="ColorScheme-Background" fill="currentColor" x="8" y="1" width="24" height="7"/>
+  </g>
+  <g id="topright">
+    <path class="ColorScheme-Highlight" fill="currentColor" d="M32 0h2a6 6 0 0 1 6 6v2h-8z"/>
+    <path class="ColorScheme-Background" fill="currentColor" d="M32 1h2a5 5 0 0 1 5 5v2h-7z"/>
+  </g>
+  <g id="left">
+    <rect class="ColorScheme-Highlight" fill="currentColor" x="0" y="8" width="1" height="24"/>
+    <rect class="ColorScheme-Background" fill="currentColor" x="1" y="8" width="7" height="24"/>
+  </g>
+  <rect id="center" class="ColorScheme-Background" fill="currentColor" x="8" y="8" width="24" height="24"/>
+  <g id="right">
+    <rect class="ColorScheme-Background" fill="currentColor" x="32" y="8" width="7" height="24"/>
+    <rect class="ColorScheme-Highlight" fill="currentColor" x="39" y="8" width="1" height="24"/>
+  </g>
+  <g id="bottomleft">
+    <path class="ColorScheme-Highlight" fill="currentColor" d="M0 32h8v8H6a6 6 0 0 1-6-6z"/>
+    <path class="ColorScheme-Background" fill="currentColor" d="M1 32h7v7H6a5 5 0 0 1-5-5z"/>
+  </g>
+  <g id="bottom">
+    <rect class="ColorScheme-Background" fill="currentColor" x="8" y="32" width="24" height="7"/>
+    <rect class="ColorScheme-Highlight" fill="currentColor" x="8" y="39" width="24" height="1"/>
+  </g>
+  <g id="bottomright">
+    <path class="ColorScheme-Highlight" fill="currentColor" d="M32 32h8v2a6 6 0 0 1-6 6h-2z"/>
+    <path class="ColorScheme-Background" fill="currentColor" d="M32 32h7v2a5 5 0 0 1-5 5h-2z"/>
+  </g>
+  <rect id="hint-top-margin" opacity="0" x="0" y="50" width="1" height="6"/>
+  <rect id="hint-bottom-margin" opacity="0" x="4" y="50" width="1" height="6"/>
+  <rect id="hint-left-margin" opacity="0" x="8" y="50" width="6" height="1"/>
+  <rect id="hint-right-margin" opacity="0" x="16" y="50" width="6" height="1"/>
+</svg>

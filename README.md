@@ -15,7 +15,7 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `claude/{CLAUDE.md,settings.json,statusline-command.sh,hooks,skills}` | `~/.claude/` |
 | `git-hooks/` | `core.hooksPath` in `desktop.gitconfig` |
 | `mouseless/config.yaml` | mouseless app config |
-| `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,konsole}/*` | same path under `~/.local/share/` |
+| `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,icons,konsole}/*` | same path under `~/.local/share/` |
 
 The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path for `core.hooksPath`.
 
@@ -26,7 +26,7 @@ The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path
 ```bash
 sudo pacman -S --needed base-devel git git-lfs gnupg python tmux kitty gdb neovim \
     lsd bat ctags ripgrep curl unzip clang llvm pahole tree-sitter-cli \
-    rustup nodejs npm wl-clipboard xclip ttf-jetbrains-mono-nerd
+    rustup nodejs npm wl-clipboard xclip ttf-jetbrains-mono-nerd papirus-icon-theme
 rustup default stable
 ```
 
@@ -35,7 +35,7 @@ rustup default stable
 ```bash
 sudo apt install build-essential git git-lfs gnupg python3 python3-venv tmux kitty gdb \
     lsd bat universal-ctags ripgrep curl unzip clang clangd llvm dwarves \
-    nodejs npm wl-clipboard xclip
+    nodejs npm wl-clipboard xclip papirus-icon-theme
 mkdir -p ~/.local/bin && ln -sfn /usr/bin/batcat ~/.local/bin/bat
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 . ~/.cargo/env

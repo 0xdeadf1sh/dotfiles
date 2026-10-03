@@ -20,6 +20,9 @@ link "$d/desktop.tmux.conf" ~/.tmux.conf
 link "$d/desktop.gdbinit"   ~/.gdbinit
 link "$d/kitty.conf"        ~/.config/kitty/kitty.conf
 link "$d/nvim"              ~/.config/nvim
+link "$d/lsd"               ~/.config/lsd
+link "$d/bat"               ~/.config/bat
+command -v bat >/dev/null && bat cache --build >/dev/null
 for f in CLAUDE.md settings.json statusline-command.sh hooks skills; do
     link "$d/claude/$f" ~/.claude/$f
 done

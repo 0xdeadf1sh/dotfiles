@@ -54,11 +54,18 @@ export PAGER=less
 # nice-looking prompt, led by the BG reading where t1dmkd (T1DMKDE) runs, else a penguin
 mark='$(command -v t1dmkd >/dev/null && t1dmkd prompt 2>/dev/null || printf "🐧")'
 if [ $USER == "root" ]; then
-    export PS1="$mark [\[\033[1;31m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
+    user='\[\033[1;38;2;255;59;59m\]'
 else
-    export PS1="$mark [\[\033[1;32m\]\u \[\033[1;33m\]{\j} \[\033[1;36m\]\W\[\033[1;00m\]]\$ "
+    user='\[\033[1;38;2;0;255;65m\]'
 fi
-unset mark
+export PS1="$mark [$user\u \[\033[0;38;2;21;154;56m\]{\j} \[\033[1;38;2;125;255;160m\]\W\[\033[0m\]]\$ "
+unset mark user
+
+# matches: black on bright green; file names, line numbers, separators in dim greens
+export GREP_COLORS='ms=1;38;2;0;0;0;48;2;0;255;65:mc=1;38;2;0;0;0;48;2;0;255;65:fn=38;2;125;255;160:ln=38;2;21;154;56:bn=38;2;21;154;56:se=38;2;11;107;38'
+export BAT_THEME=Matrix
+eval "$(dircolors -b)"
+LS_COLORS+=':di=1;38;2;125;255;160:ex=1;38;2;0;255;65:ln=38;2;86;212;221'
 
 # fix git's gpg signing problem
 export GPG_TTY=$(tty)

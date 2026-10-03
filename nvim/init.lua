@@ -9,7 +9,7 @@ require("user.asm").setup()
 require("user.layout").setup()
 require("user.storage").setup()
 
-vim.cmd("colorscheme github_dark_high_contrast")
+vim.cmd("colorscheme matrix")
 
 local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
@@ -20,11 +20,3 @@ vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help ta
 vim.diagnostic.config({
 	float = { focus = false },
 })
-
-vim.cmd([[
-  highlight Normal guibg=none
-  highlight NormalNC guibg=none
-  highlight LineNr guibg=none
-  highlight SignColumn guibg=none
-  highlight EndOfBuffer guibg=none
-]])

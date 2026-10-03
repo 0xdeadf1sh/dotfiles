@@ -646,13 +646,12 @@ require("lazy").setup({
 		opts = {},
 	},
 
-	{ "projekt0n/github-nvim-theme", name = "github-theme" },
-
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = function()
 			return {
+				options = { theme = "matrix" },
 				sections = {
 					lualine_c = { "filename", { vim.lsp.status } },
 					lualine_x = { { require("user.glucose") }, "encoding", "fileformat", "filetype" },

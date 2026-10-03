@@ -68,7 +68,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -158,7 +158,7 @@
       "effortLevel": "xhigh"
     },
     "claude-opus-5-5": {
-      "effortLevel": "xhigh"
+      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": false,
@@ -172,7 +172,7 @@
   },
   "timeFormat": "auto",
   "skipWorkflowUsageWarning": true,
-  "theme": "dark",
+  "theme": "auto",
   "editorMode": "vim",
   "autoCompactEnabled": true,
   "switchModelsOnFlag": false,

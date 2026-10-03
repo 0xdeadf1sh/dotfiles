@@ -1,0 +1,12 @@
+[kdeglobals][KDE]
+widgetStyle=Breeze
+
+[kdeglobals][General]
+ColorScheme=AmoledMatrix
+
+[plasmarc][Theme]
+name=amoled-matrix
+
+[kwinrc][org.kde.kdecoration2]
+library=org.kde.kwin.aurorae
+theme=__aurorae__svg__AmoledMatrix

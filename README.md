@@ -15,6 +15,7 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `claude/{CLAUDE.md,settings.json,statusline-command.sh,hooks,skills}` | `~/.claude/` |
 | `git-hooks/` | `core.hooksPath` in `desktop.gitconfig` |
 | `mouseless/config.yaml` | mouseless app config |
+| `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,konsole}/*` | same path under `~/.local/share/` |
 
 The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path for `core.hooksPath`.
 

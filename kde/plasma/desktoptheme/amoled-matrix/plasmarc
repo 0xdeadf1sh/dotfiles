@@ -1,0 +1,8 @@
+[AdaptiveTransparency]
+enabled=false
+
+[ContrastEffect]
+enabled=false
+
+[BlurBehindEffect]
+enabled=false

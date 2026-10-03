@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=AMOLED Matrix
+Comment=Pure-black window frame with a 1px green border on the active window
+X-KDE-PluginInfo-Author=0xdeadf1sh
+X-KDE-PluginInfo-Name=AmoledMatrix
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true

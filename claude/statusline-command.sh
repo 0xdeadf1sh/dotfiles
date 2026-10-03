@@ -3,7 +3,7 @@
 
 Reads the statusline JSON event on stdin and emits a single ANSI-decorated line.
 Pulls live context usage from the transcript JSONL, then fills the remaining
-terminal width with a flowing color-wave keyed off wall-clock time. The
+terminal width with a Matrix code stream, lit up to the context-usage mark. The
 animation advances each time Claude Code redraws the statusline (typing,
 tool calls, response chunks); there is no background tick.
 """
@@ -15,28 +15,29 @@ from pathlib import Path
 RESET  = "\033[0m"
 BOLD   = "\033[1m"
 DIM    = "\033[2m"
-GREEN  = "\033[38;5;114m"
-CYAN   = "\033[38;5;110m"
-YELLOW = "\033[38;5;180m"
-PURPLE = "\033[38;5;176m"
-GRAY   = "\033[38;5;245m"
-RED    = "\033[38;5;167m"
+WHITE  = "\033[38;5;231m"
+GREEN  = "\033[38;5;46m"
+CYAN   = "\033[38;5;40m"
+YELLOW = "\033[38;5;184m"
+PURPLE = "\033[38;5;34m"
+GRAY   = "\033[38;5;22m"
+RED    = "\033[38;5;196m"
 
-# --- Nerd Font icons (replace with plain text if you don't have a Nerd Font)
-USER_ICON   = "🐟"
-DISTRO_ICON = "🐧"
-DIR_ICON    = "📁"
-GIT_ICON    = "🌿"
-MODEL_ICON  = "✨"
-EFFORT_ICON = "⚡"
-SUB_ICON    = "💎"
-API_ICON    = "🔑"
-CLOUD_ICON  = "☁️ "
-PLUG_ICON   = "🔌"
-MEM_ICON    = "🧠"
-SKILL_ICON  = "🧰"
-CTX_ICON    = "📊"
-BG_ICON     = "🩸"
+# Halfwidth katakana: 1 cell, like ASCII.
+USER_ICON   = "ﾕ"
+DISTRO_ICON = "ｼ"
+DIR_ICON    = "ﾃ"
+GIT_ICON    = "⌥"
+MODEL_ICON  = "ﾓ"
+EFFORT_ICON = "ﾘ"
+SUB_ICON    = "ﾌ"
+API_ICON    = "ﾌ"
+CLOUD_ICON  = "ﾌ"
+PLUG_ICON   = "ﾌ"
+MEM_ICON    = "ｷ"
+SKILL_ICON  = "ｽ"
+CTX_ICON    = "ｺ"
+BG_ICON     = "ﾁ"
 
 CONTEXT_WINDOW = 1_000_000
 
@@ -130,16 +131,14 @@ def detect_provider() -> tuple[str, str, str]:
         except Exception:
             host = base
         if host and "anthropic.com" not in host.lower():
-            return PLUG_ICON, host, "\x1b[1;38;5;215m"
+            return PLUG_ICON, host, CYAN
     if os.environ.get("CLAUDE_CODE_USE_BEDROCK"):
-        return CLOUD_ICON, "Bedrock", "\x1b[1;38;5;215m"
+        return CLOUD_ICON, "Bedrock", CYAN
     if os.environ.get("CLAUDE_CODE_USE_VERTEX"):
-        return CLOUD_ICON, "Vertex", "\x1b[1;38;5;215m"
+        return CLOUD_ICON, "Vertex", CYAN
     if os.environ.get("ANTHROPIC_API_KEY"):
-        return API_ICON, "API", "\x1b[1;38;5;110m"
-    if (Path.home() / ".claude" / ".credentials.json").is_file():
-        return SUB_ICON, "Subscription", "\x1b[1;38;5;213m"
-    return SUB_ICON, "Subscription", "\x1b[1;38;5;213m"
+        return API_ICON, "API", CYAN
+    return SUB_ICON, "Subscription", CYAN
 
 
 def glucose() -> str | None:
@@ -199,13 +198,12 @@ def ctx_color(pct: float) -> str:
     return GREEN
 
 
-# Effort scales green → red with intensity; "max" gets the bold-red treatment.
 EFFORT_COLORS = {
-    "low":    GREEN,
-    "medium": CYAN,
-    "high":   YELLOW,
-    "xhigh":  PURPLE,
-    "max":    "\x1b[1;38;5;203m",
+    "low":    GRAY,
+    "medium": PURPLE,
+    "high":   CYAN,
+    "xhigh":  GREEN,
+    "max":    WHITE,
 }
 
 
@@ -213,12 +211,9 @@ def effort_color(level: str) -> str:
     return EFFORT_COLORS.get(level, GRAY)
 
 
-# --- Pacman animation ---------------------------------------------------
-# Stateless: every visible thing is a pure function of (width, time.time()).
-# Pacman triangle-waves across [0, width-1]; the last time he visited each
-# cell determines whether the dot/fruit is currently eaten.
+# --- Matrix stream ------------------------------------------------------
 
-STATE_FILE = Path.home() / ".claude" / ".statusline-pacman.state"
+STATE_FILE = Path.home() / ".claude" / ".statusline-matrix.state"
 
 
 def next_frame() -> int:
@@ -226,7 +221,7 @@ def next_frame() -> int:
 
     The statusline hook does not fire on a timer; it fires on discrete events.
     Driving the animation off wall-clock time means most "frames" are skipped.
-    Driving it off this counter means each redraw advances pacman one step.
+    Driving it off this counter means each redraw advances the rain one step.
     """
     try:
         n = int(STATE_FILE.read_text().strip())
@@ -239,57 +234,40 @@ def next_frame() -> int:
         pass
     return n
 
-PAC_YELLOW  = "\x1b[1;38;5;226m"  # bright pacman
-TRAIL_YEL   = "\x1b[38;5;221m"    # consumed-road yellow
-DOT_DIM     = "\x1b[2;38;5;245m"  # available-road grey
-FRUITS      = ("🍒", "🍓", "🍊", "🍎", "🍈")
-
-FRUIT_EVERY = 23
-
-
-def _fruit(i: int) -> str | None:
-    """The fruit on road cell `i`, or None for a plain dot."""
-    if (i + 7) % FRUIT_EVERY:
-        return None
-    return FRUITS[((i + 7) // FRUIT_EVERY - 1) % len(FRUITS)]
+# Every glyph must be 1 cell wide, or the line overruns SAFETY and gets truncated.
+GLYPHS = ("ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"
+          "0123456789Z:.=*+-<>¦")
+RAIN_HEAD   = f"{BOLD}{WHITE}"
+RAIN_BRIGHT = f"{BOLD}{GREEN}"
+RAIN_PERIOD = 14
 
 
-def pacman_fill(width: int, pct: float, frame: int) -> str:
-    """Render a road of `width` cells where pacman's position reflects the
-    context-usage percentage. Behind = consumed; ahead = available. The
-    `frame` counter drives the chomp animation only — position is purely
-    a function of `pct`."""
-    if width <= 1:
+def _hash(a: int, b: int) -> int:
+    h = (a * 0x9E3779B1 ^ b * 0x85EBCA77) & 0xFFFFFFFF
+    h ^= h >> 15
+    h = (h * 0x2C1B3C6D) & 0xFFFFFFFF
+    return h ^ (h >> 12)
+
+
+def matrix_fill(width: int, pct: float, frame: int) -> str:
+    """Cells before the `pct` mark rain at full density; cells after it
+    flicker sparsely in the darkest green."""
+    if width <= 0:
         return ""
-    span = width - 1
-    pct = max(0.0, min(100.0, pct))
-    pac_x = int(round(pct / 100.0 * span))
-
-    # Chomp: alternate open/closed each redraw so he still looks alive
-    # even when pct doesn't change.
-    chomp_open = (frame % 2 == 0)
-    pac_glyph = "ᗧ" if chomp_open else "●"
-
-    # Fruit emoji are 2 cells while every other road glyph is 1, so a fruit
-    # consumes the column to its right to keep the road's total display width
-    # exactly `width` — otherwise it eats into the SAFETY margin and the TUI
-    # truncates the line.
+    mark = int(round(max(0.0, min(100.0, pct)) / 100.0 * (width - 1)))
     out = []
-    i = 0
-    while i < width:
-        if i == pac_x:
-            out.append(f"{PAC_YELLOW}{pac_glyph}{RESET}")
-        elif i < pac_x:  # behind = consumed
-            out.append(f"{TRAIL_YEL}•{RESET}")
-        else:  # ahead = available
-            fruit = _fruit(i)
-            if fruit and i + 1 < width and i + 1 != pac_x:
-                out.append(fruit)
-                i += 1  # the emoji visually covers this next column too
-            else:
-                out.append(f"{DOT_DIM}·{RESET}")
-        i += 1
-    return "".join(out)
+    for i in range(width):
+        phase = (frame + _hash(i, 0)) % RAIN_PERIOD
+        glyph = GLYPHS[_hash(i, frame) % len(GLYPHS)]
+        if i == mark:
+            out.append(f"{RESET}{RAIN_HEAD}{glyph}")
+        elif i < mark:
+            col = (RAIN_HEAD if phase == 0 else RAIN_BRIGHT if phase < 4
+                   else PURPLE if phase < 9 else GRAY)
+            out.append(f"{RESET}{col}{glyph}")
+        else:
+            out.append(f"{RESET}{GRAY}{glyph}" if phase < 2 else " ")
+    return "".join(out) + RESET
 
 
 def _ioctl_cols(target) -> int | None:
@@ -380,29 +358,29 @@ def main() -> None:
     branch = git_branch(cwd)
     distro = detect_distro()
 
-    sep = f"{DIM}{GRAY} · {RESET}"
-    parts = [f"{BOLD}{GREEN}{USER_ICON}  {user}{RESET}"]
+    sep = f"{GRAY} │ {RESET}"
+    parts = [f"{BOLD}{GREEN}{USER_ICON} {user}{RESET}"]
     if distro:
-        parts.append(f"{BOLD}{CYAN}{DISTRO_ICON}  {distro}{RESET}")
-    parts.append(f"{BOLD}{CYAN}{DIR_ICON}  {dirname}{RESET}")
+        parts.append(f"{BOLD}{CYAN}{DISTRO_ICON} {distro}{RESET}")
+    parts.append(f"{BOLD}{CYAN}{DIR_ICON} {dirname}{RESET}")
     if branch:
-        parts.append(f"{BOLD}{YELLOW}{GIT_ICON}  {branch}{RESET}")
+        parts.append(f"{BOLD}{GREEN}{GIT_ICON} {branch}{RESET}")
     if model_name:
-        parts.append(f"{BOLD}{PURPLE}{MODEL_ICON}  {model_name}{RESET}")
+        parts.append(f"{BOLD}{PURPLE}{MODEL_ICON} {model_name}{RESET}")
     effort = (data.get("effort") or {}).get("level")
     if effort:
-        parts.append(f"{BOLD}{effort_color(effort)}{EFFORT_ICON}  {effort}{RESET}")
+        parts.append(f"{BOLD}{effort_color(effort)}{EFFORT_ICON} {effort}{RESET}")
     bg = glucose()
     if bg:
-        parts.append(f"{BG_ICON}  {bg}{RESET}")
+        parts.append(f"{BOLD}{GREEN}{BG_ICON}{RESET} {bg}{RESET}")
     else:
         prov_icon, prov_label, prov_color = detect_provider()
-        parts.append(f"{BOLD}{prov_color}{prov_icon}  {prov_label}{RESET}")
+        parts.append(f"{BOLD}{prov_color}{prov_icon} {prov_label}{RESET}")
 
     mem_n = count_memories(cwd)
     skill_n = count_skills(cwd)
-    parts.append(f"{BOLD}{PURPLE}{MEM_ICON}  {mem_n}{RESET}")
-    parts.append(f"{BOLD}{YELLOW}{SKILL_ICON}  {skill_n}{RESET}")
+    parts.append(f"{BOLD}{PURPLE}{MEM_ICON} {mem_n}{RESET}")
+    parts.append(f"{BOLD}{CYAN}{SKILL_ICON} {skill_n}{RESET}")
 
     used = context_tokens(transcript)
     window = CONTEXT_WINDOW
@@ -410,7 +388,7 @@ def main() -> None:
     if used is not None:
         col = ctx_color(pct)
         parts.append(
-            f"{BOLD}{col}{CTX_ICON}  {fmt_tokens(used)}/{fmt_tokens(window)} "
+            f"{BOLD}{col}{CTX_ICON} {fmt_tokens(used)}/{fmt_tokens(window)} "
             f"({pct:.0f}%){RESET}"
         )
 
@@ -419,9 +397,9 @@ def main() -> None:
     # Claude Code's TUI reserves a few right-edge cells for its own chrome /
     # overflow indicator. Without this margin the line is truncated to "…".
     SAFETY = 4
-    GAP = 1  # single breathing space between content and road
+    GAP = 1
     fill_w = max(0, width - visible_len(content) - GAP - SAFETY)
-    fill = pacman_fill(fill_w, pct, next_frame())
+    fill = matrix_fill(fill_w, pct, next_frame())
     sys.stdout.write(content + (" " * GAP) + fill)
 
 

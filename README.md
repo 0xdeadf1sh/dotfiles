@@ -16,6 +16,7 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `git-hooks/` | `core.hooksPath` in `desktop.gitconfig` |
 | `mouseless/config.yaml` | mouseless app config |
 | `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,konsole}/*` | same path under `~/.local/share/` |
+| `kde/sddm/amoled-matrix/` | copied to `/usr/share/sddm/themes/amoled-matrix` |
 | `kde/icons/tint.py` | generates `~/.local/share/icons/AmoledMatrix` from Papirus-Dark, plus tinted copies of installed apps' own icons that Papirus lacks |
 
 The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path for `core.hooksPath`.
@@ -70,9 +71,30 @@ git clone https://github.com/0xdeadf1sh/dotfiles.git ~/Desktop/dotfiles
 
 `install.sh` links every target in the layout table. A real file or directory already at a target is
 renamed to `<target>.bak.<epoch>`. The KDE part runs only when `plasmashell` exists; it regenerates the
-icon theme from the installed Papirus, so it is re-run after a `papirus-icon-theme` update.
+icon theme from the installed Papirus, so it is re-run after a `papirus-icon-theme` update. It also
+sets the AMOLED Matrix splash screen. When `/usr/share/sddm/themes` exists, it copies the SDDM theme there
+and sets `Current=amoled-matrix` (in `/etc/sddm.conf` when it already has that key, otherwise in
+`/etc/sddm.conf.d/theme.conf`); this step uses `sudo`. The script runs as the normal
+user and exits under root.
 
 The first Neovim start installs plugins, treesitter parsers and Mason tools.
+
+## console colors
+
+These kernel parameters make the default console text `#00ff41` (palette entry 7) and bright white
+`#c0ffd0` (entry 15), including kernel messages at boot:
+
+```
+vt.default_red=0,170,0,170,0,170,0,0,85,255,85,255,85,255,85,192
+vt.default_grn=0,0,170,85,0,0,170,255,85,85,255,255,85,85,255,255
+vt.default_blu=0,0,0,0,170,170,170,65,85,85,85,85,255,255,255,208
+```
+
+- systemd-boot: appended to the `options` line in `/boot/loader/entries/<entry>.conf`.
+- GRUB: appended to `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`, followed by `sudo update-grub`
+  (Debian, Ubuntu) or `sudo grub-mkconfig -o /boot/grub/grub.cfg` (Arch).
+
+`cat /proc/cmdline` shows the parameters after a reboot.
 
 ## x86_64 and aarch64
 

@@ -1,0 +1,1 @@
+../../plasma/look-and-feel/org.amoledmatrix.desktop/contents/splash/Rain.qml

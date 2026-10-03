@@ -1,0 +1,12 @@
+[SddmGreeterTheme]
+Name=AMOLED Matrix
+Description=Digital rain behind a minimal green-on-black login
+Author=0xdeadf1sh
+License=GPLv2+
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=amoled-matrix
+Theme-API=2.0
+QtVersion=6

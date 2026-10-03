@@ -87,7 +87,9 @@ The first Neovim start installs plugins, treesitter parsers and Mason tools.
 - Firefox: `install.sh` links `user.js` and `chrome/` into the profile named by each `[Install*]`
   section of `profiles.ini`, under `~/.config/mozilla/firefox`, `~/.mozilla/firefox` or the snap
   path. A profile exists only after the first Firefox start. `user.js` enables `userChrome.css` and
-  `userContent.css`, forces dark pages, and sets the blank-page color to black.
+  `userContent.css`, forces dark pages, and sets the blank-page color to black. In the built-in PDF
+  viewer, `userContent.css` colors the toolbar and sidebar and color-inverts pages and thumbnails;
+  images keep their approximate hue.
 - Chromium: `install.sh` writes `--load-extension=<repo>/chromium/matrix-theme` to
   `~/.config/chromium-flags.conf`, which the Arch launcher reads. On other distros the theme is loaded
   once from `chrome://extensions` → Developer mode → Load unpacked. The theme colors the frame, tabs,

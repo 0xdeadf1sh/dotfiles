@@ -1,16 +1,65 @@
+:root {
+    --mx-black: #000000;
+    --mx-bg1: #011508;
+    --mx-bg2: #03240d;
+    --mx-bg3: #063d16;
+    --mx-dim: #0b6b26;
+    --mx-mid: #159a38;
+    --mx-fg: #20c84a;
+    --mx-bright: #00ff41;
+    --mx-lime: #4dff88;
+    --mx-pale: #7dffa0;
+}
+
+/* pdf.js viewer: its document URL is the PDF's, so only this root attribute identifies it. */
+:root[mozdisallowselectionprint] {
+    color-scheme: dark !important;
+
+    --main-color: var(--mx-fg) !important;
+    --body-bg-color: var(--mx-black) !important;
+    --page-bg-color: var(--mx-black) !important;
+    --progressBar-color: var(--mx-bright) !important;
+    --progressBar-bg-color: var(--mx-bg2) !important;
+    --progressBar-blend-color: var(--mx-mid) !important;
+    --scrollbar-color: var(--mx-dim) !important;
+    --scrollbar-bg-color: var(--mx-black) !important;
+    --toolbar-icon-bg-color: var(--mx-fg) !important;
+    --toolbar-icon-hover-bg-color: var(--mx-bright) !important;
+    --sidebar-narrow-bg-color: var(--mx-bg1) !important;
+    --sidebar-toolbar-bg-color: var(--mx-bg1) !important;
+    --toolbar-bg-color: var(--mx-bg1) !important;
+    --toolbar-border-color: var(--mx-bg3) !important;
+    --button-hover-color: var(--mx-bg2) !important;
+    --toggled-btn-color: var(--mx-bright) !important;
+    --toggled-btn-bg-color: var(--mx-bg3) !important;
+    --toggled-hover-active-btn-color: var(--mx-dim) !important;
+    --dropdown-btn-bg-color: var(--mx-bg2) !important;
+    --separator-color: var(--mx-bg3) !important;
+    --field-color: var(--mx-fg) !important;
+    --field-bg-color: var(--mx-black) !important;
+    --field-border-color: var(--mx-dim) !important;
+    --doorhanger-bg-color: var(--mx-bg1) !important;
+    --doorhanger-border-color: var(--mx-bg3) !important;
+    --doorhanger-hover-color: var(--mx-bright) !important;
+    --doorhanger-separator-color: var(--mx-bg3) !important;
+
+    .treeView {
+        --treeitem-color: var(--mx-fg) !important;
+        --treeitem-bg-color: var(--mx-bg2) !important;
+        --treeitem-hover-color: var(--mx-bright) !important;
+        --treeitem-selected-color: var(--mx-bright) !important;
+        --treeitem-selected-bg-color: var(--mx-bg3) !important;
+    }
+
+    /* Hue rotation undoes invert's hue flip, so images keep roughly their colors. */
+    .canvasWrapper > canvas,
+    .thumbnailImageContainer > img {
+        filter: invert(1) hue-rotate(180deg) !important;
+    }
+}
+
 @-moz-document url-prefix("about:") {
     :root {
-        --mx-black: #000000;
-        --mx-bg1: #011508;
-        --mx-bg2: #03240d;
-        --mx-bg3: #063d16;
-        --mx-dim: #0b6b26;
-        --mx-mid: #159a38;
-        --mx-fg: #20c84a;
-        --mx-bright: #00ff41;
-        --mx-lime: #4dff88;
-        --mx-pale: #7dffa0;
-
         color-scheme: dark !important;
 
         --background-color-canvas: var(--mx-black) !important;

@@ -93,7 +93,8 @@ The first Neovim start installs plugins, treesitter parsers and Mason tools.
   once from `chrome://extensions` → Developer mode → Load unpacked. The theme colors the frame, tabs,
   toolbar, omnibox and new tab page; menus, focus rings and the new tab search box keep Chromium's colors.
 - Dark Reader: Settings → Advanced → Import Settings → `darkreader/matrix.json`, once per browser. The
-  file sets only the theme colors; site lists stay as they are.
+  file sets the theme colors and turns off dark-site detection, so sites with their own dark theme also
+  get the matrix colors; site lists stay as they are.
 
 ## console colors
 

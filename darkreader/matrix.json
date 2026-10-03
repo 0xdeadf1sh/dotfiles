@@ -1,5 +1,6 @@
 {
     "changeBrowserTheme": false,
+    "detectDarkTheme": false,
     "theme": {
         "mode": 1,
         "brightness": 100,

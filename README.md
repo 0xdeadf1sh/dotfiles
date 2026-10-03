@@ -15,7 +15,8 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `claude/{CLAUDE.md,settings.json,statusline-command.sh,hooks,skills}` | `~/.claude/` |
 | `git-hooks/` | `core.hooksPath` in `desktop.gitconfig` |
 | `mouseless/config.yaml` | mouseless app config |
-| `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,icons,konsole}/*` | same path under `~/.local/share/` |
+| `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,konsole}/*` | same path under `~/.local/share/` |
+| `kde/icons/tint.py` | generates `~/.local/share/icons/AmoledMatrix` from Papirus-Dark |
 
 The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path for `core.hooksPath`.
 
@@ -64,21 +65,12 @@ fc-cache -f
 
 ```bash
 git clone https://github.com/0xdeadf1sh/dotfiles.git ~/Desktop/dotfiles
-d=~/Desktop/dotfiles
-mkdir -p ~/.config/kitty ~/.claude
-ln -sfn $d/desktop.bashrc    ~/.bashrc
-ln -sfn $d/desktop.gitconfig ~/.gitconfig
-ln -sfn $d/desktop.tmux.conf ~/.tmux.conf
-ln -sfn $d/desktop.gdbinit   ~/.gdbinit
-ln -sfn $d/kitty.conf        ~/.config/kitty/kitty.conf
-ln -sfn $d/nvim              ~/.config/nvim
-for f in CLAUDE.md settings.json statusline-command.sh hooks skills; do
-    ln -sfn $d/claude/$f ~/.claude/$f
-done
+~/Desktop/dotfiles/install.sh
 ```
 
-`ln -sfn` replaces existing files. A real directory already at `~/.config/nvim`, `~/.claude/hooks` or
-`~/.claude/skills` gets the link placed inside it, so it is moved away first.
+`install.sh` links every target in the layout table. A real file or directory already at a target is
+renamed to `<target>.bak.<epoch>`. The KDE part runs only when `plasmashell` exists; it regenerates the
+icon theme from the installed Papirus, so it is re-run after a `papirus-icon-theme` update.
 
 The first Neovim start installs plugins, treesitter parsers and Mason tools.
 

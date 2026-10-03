@@ -1,0 +1,116 @@
+:root {
+    --mx-black: #000000;
+    --mx-bg1: #011508;
+    --mx-bg2: #03240d;
+    --mx-bg3: #063d16;
+    --mx-dim: #0b6b26;
+    --mx-mid: #159a38;
+    --mx-fg: #20c84a;
+    --mx-bright: #00ff41;
+    --mx-lime: #4dff88;
+    --mx-pale: #7dffa0;
+    --mx-red: #ff3b3b;
+    --mx-font: "JetBrainsMono Nerd Font", monospace;
+}
+
+/* popup.css redefines the panel colors on menupopup and panel, so :root alone is not enough. */
+:root, menupopup, panel {
+    color-scheme: dark !important;
+
+    --toolbox-background-color: var(--mx-black) !important;
+    --toolbox-background-color-inactive: var(--mx-black) !important;
+    --toolbox-text-color: var(--mx-fg) !important;
+    --toolbox-text-color-inactive: var(--mx-mid) !important;
+
+    --toolbar-background-color: var(--mx-bg1) !important;
+    --toolbar-text-color: var(--mx-fg) !important;
+    --toolbarbutton-icon-fill: var(--mx-fg) !important;
+    --toolbarbutton-icon-fill-attention: var(--mx-bright) !important;
+    --toolbarbutton-background-color-hover: var(--mx-bg2) !important;
+    --toolbarbutton-background-color-active: var(--mx-bg3) !important;
+    --toolbarseparator-color: var(--mx-bg3) !important;
+
+    --toolbar-field-background-color: var(--mx-black) !important;
+    --toolbar-field-text-color: var(--mx-fg) !important;
+    --toolbar-field-border-color: var(--mx-bg3) !important;
+    --toolbar-field-background-color-focus: var(--mx-black) !important;
+    --toolbar-field-text-color-focus: var(--mx-bright) !important;
+    --toolbar-field-border-color-focus: var(--mx-bright) !important;
+    --lwt-toolbar-field-highlight: var(--mx-bg3) !important;
+    --lwt-toolbar-field-highlight-text: var(--mx-bright) !important;
+
+    --tab-background-color-selected: var(--mx-bg1) !important;
+    --tab-selected-textcolor: var(--mx-bright) !important;
+    --tab-background-color-hover: var(--mx-bg1) !important;
+    --tab-selected-outline-color: var(--mx-dim) !important;
+    --tab-hover-outline-color: var(--mx-bg3) !important;
+    --tab-loading-fill: var(--mx-bright) !important;
+    --tabs-navbar-separator-color: var(--mx-bg3) !important;
+    --chrome-content-separator-color: var(--mx-bg3) !important;
+
+    --panel-background-color: var(--mx-black) !important;
+    --panel-text-color: var(--mx-fg) !important;
+    --panel-border-color: var(--mx-dim) !important;
+    --panel-separator-color: var(--mx-bg3) !important;
+    --panel-icon-fill: var(--mx-fg) !important;
+
+    --urlbarview-background-color-hover: var(--mx-bg2) !important;
+    --urlbarview-background-color-selected: var(--mx-bg3) !important;
+    --urlbarview-text-color-selected: var(--mx-bright) !important;
+    --urlbarview-text-color-secondary: var(--mx-mid) !important;
+    --urlbarview-text-color-action: var(--mx-pale) !important;
+    --urlbarview-separator-color: var(--mx-bg3) !important;
+
+    --sidebar-background-color: var(--mx-black) !important;
+    --sidebar-text-color: var(--mx-fg) !important;
+    --sidebar-border-color: var(--mx-bg3) !important;
+    --tabpanel-background-color: var(--mx-black) !important;
+
+    --background-color-canvas: var(--mx-black) !important;
+    --background-color-box: var(--mx-black) !important;
+    --text-color: var(--mx-fg) !important;
+    --text-color-deemphasized: var(--mx-mid) !important;
+    --border-color: var(--mx-bg3) !important;
+    --icon-color: var(--mx-fg) !important;
+    --input-text-background-color: var(--mx-black) !important;
+    --input-text-color: var(--mx-fg) !important;
+    --focus-outline-color: var(--mx-bright) !important;
+    --color-accent-primary: var(--mx-fg) !important;
+    --color-accent-primary-hover: var(--mx-lime) !important;
+    --color-accent-primary-active: var(--mx-bright) !important;
+    --link-color: var(--mx-pale) !important;
+    --link-color-hover: var(--mx-lime) !important;
+    --link-color-active: var(--mx-bright) !important;
+    --button-background-color: var(--mx-bg2) !important;
+    --button-background-color-hover: var(--mx-bg3) !important;
+    --button-background-color-active: var(--mx-dim) !important;
+    --button-text-color: var(--mx-fg) !important;
+    --button-background-color-primary: var(--mx-fg) !important;
+    --button-background-color-primary-hover: var(--mx-lime) !important;
+    --button-background-color-primary-active: var(--mx-bright) !important;
+    --button-text-color-primary: var(--mx-black) !important;
+}
+
+:root, menupopup, panel, tooltip {
+    font-family: var(--mx-font) !important;
+}
+
+menu, menuitem {
+    &[_moz-menuactive]:not([disabled]) {
+        color: var(--mx-bright) !important;
+        background-color: var(--mx-bg3) !important;
+    }
+}
+
+.tabbrowser-tab[selected] .tab-label {
+    text-shadow: 0 0 4px var(--mx-bright);
+}
+
+#urlbar[focused] .urlbar-input {
+    caret-color: var(--mx-bright);
+}
+
+::selection {
+    background-color: var(--mx-bg3) !important;
+    color: var(--mx-bright) !important;
+}

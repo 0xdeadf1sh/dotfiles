@@ -18,6 +18,9 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `kde/{color-schemes,plasma/desktoptheme,plasma/look-and-feel,aurorae/themes,konsole}/*` | same path under `~/.local/share/` |
 | `kde/sddm/amoled-matrix/` | copied to `/usr/share/sddm/themes/amoled-matrix` |
 | `kde/icons/tint.py` | generates `~/.local/share/icons/AmoledMatrix` from Papirus-Dark, plus tinted copies of installed apps' own icons that Papirus lacks |
+| `firefox/{user.js,chrome}` | each install's default profile in `profiles.ini` |
+| `chromium/matrix-theme/` | `--load-extension` line in `~/.config/chromium-flags.conf` |
+| `darkreader/matrix.json` | none; imported by hand in Dark Reader |
 
 The clone lives at `~/Desktop/dotfiles`; `desktop.gitconfig` hardcodes that path for `core.hooksPath`.
 
@@ -78,6 +81,19 @@ and sets `Current=amoled-matrix` (in `/etc/sddm.conf` when it already has that k
 user and exits under root.
 
 The first Neovim start installs plugins, treesitter parsers and Mason tools.
+
+## browsers
+
+- Firefox: `install.sh` links `user.js` and `chrome/` into the profile named by each `[Install*]`
+  section of `profiles.ini`, under `~/.config/mozilla/firefox`, `~/.mozilla/firefox` or the snap
+  path. A profile exists only after the first Firefox start. `user.js` enables `userChrome.css` and
+  `userContent.css`, forces dark pages, and sets the blank-page color to black.
+- Chromium: `install.sh` writes `--load-extension=<repo>/chromium/matrix-theme` to
+  `~/.config/chromium-flags.conf`, which the Arch launcher reads. On other distros the theme is loaded
+  once from `chrome://extensions` → Developer mode → Load unpacked. The theme colors the frame, tabs,
+  toolbar, omnibox and new tab page; menus, focus rings and the new tab search box keep Chromium's colors.
+- Dark Reader: Settings → Advanced → Import Settings → `darkreader/matrix.json`, once per browser. The
+  file sets only the theme colors; site lists stay as they are.
 
 ## console colors
 

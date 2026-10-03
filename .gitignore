@@ -7,3 +7,6 @@ __pycache__
 
 # claude.ai synced skills
 claude/skills/synced/
+
+# chromium writes this into an unpacked theme
+chromium/matrix-theme/Cached Theme.pak

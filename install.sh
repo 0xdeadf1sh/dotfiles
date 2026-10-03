@@ -28,6 +28,29 @@ link "$d/nvim"              ~/.config/nvim
 link "$d/lsd"               ~/.config/lsd
 link "$d/bat"               ~/.config/bat
 command -v bat >/dev/null && bat cache --build >/dev/null
+
+ff_linked=0
+for ff in "${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox" ~/.mozilla/firefox \
+          ~/snap/firefox/common/.mozilla/firefox; do
+    [[ -f $ff/profiles.ini ]] || continue
+    # [Install*] Default= is the profile each build opens; [Profile*] Default=1 is pre-67 legacy.
+    while IFS= read -r p; do
+        [[ $p == /* ]] || p=$ff/$p
+        link "$d/firefox/user.js" "$p/user.js"
+        link "$d/firefox/chrome"  "$p/chrome"
+        ff_linked=1
+    done < <(awk '/^\[/ { inst = /^\[Install/ } inst && sub(/^Default=/, "")' "$ff/profiles.ini")
+done
+if command -v firefox >/dev/null && (( ! ff_linked )); then
+    echo "no Firefox profile yet; start Firefox once and re-run"
+fi
+
+if command -v chromium >/dev/null; then
+    flags=${XDG_CONFIG_HOME:-$HOME/.config}/chromium-flags.conf
+    touch "$flags"
+    sed -i '\|chromium/matrix-theme|d' "$flags"
+    printf -- '--load-extension=%q\n' "$d/chromium/matrix-theme" >>"$flags"
+fi
 for f in CLAUDE.md settings.json statusline-command.sh hooks skills; do
     link "$d/claude/$f" ~/.claude/$f
 done

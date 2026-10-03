@@ -1,0 +1,80 @@
+@-moz-document url-prefix("about:") {
+    :root {
+        --mx-black: #000000;
+        --mx-bg1: #011508;
+        --mx-bg2: #03240d;
+        --mx-bg3: #063d16;
+        --mx-dim: #0b6b26;
+        --mx-mid: #159a38;
+        --mx-fg: #20c84a;
+        --mx-bright: #00ff41;
+        --mx-lime: #4dff88;
+        --mx-pale: #7dffa0;
+
+        color-scheme: dark !important;
+
+        --background-color-canvas: var(--mx-black) !important;
+        --background-color-box: var(--mx-bg1) !important;
+        --background-color-list-item-hover: var(--mx-bg2) !important;
+        --text-color: var(--mx-fg) !important;
+        --text-color-deemphasized: var(--mx-mid) !important;
+        --text-color-list-item-hover: var(--mx-bright) !important;
+        --border-color: var(--mx-bg3) !important;
+        --border-color-interactive: var(--mx-dim) !important;
+        --border-color-interactive-hover: var(--mx-mid) !important;
+        --icon-color: var(--mx-fg) !important;
+        --input-text-background-color: var(--mx-black) !important;
+        --input-text-color: var(--mx-fg) !important;
+        --background-color-information: var(--mx-bg2) !important;
+        --icon-color-information: var(--mx-bright) !important;
+        --focus-outline-color: var(--mx-bright) !important;
+        --color-accent-primary: var(--mx-fg) !important;
+        --color-accent-primary-hover: var(--mx-lime) !important;
+        --color-accent-primary-active: var(--mx-bright) !important;
+        --text-color-accent-primary-selected: var(--mx-black) !important;
+        --link-color: var(--mx-pale) !important;
+        --link-color-hover: var(--mx-lime) !important;
+        --link-color-active: var(--mx-bright) !important;
+        --link-color-visited: var(--mx-mid) !important;
+        --card-background-color: var(--mx-bg1) !important;
+        --card-border-color: var(--mx-bg3) !important;
+        --table-background-color: var(--mx-black) !important;
+        --table-row-background-color: var(--mx-black) !important;
+        --table-row-background-color-alternate: var(--mx-bg1) !important;
+        --table-header-background-color: var(--mx-bg2) !important;
+        --table-header-text-color: var(--mx-bright) !important;
+        --table-border-color: var(--mx-bg3) !important;
+        --button-background-color: var(--mx-bg2) !important;
+        --button-background-color-hover: var(--mx-bg3) !important;
+        --button-background-color-active: var(--mx-dim) !important;
+        --button-text-color: var(--mx-fg) !important;
+        --button-background-color-primary: var(--mx-fg) !important;
+        --button-background-color-primary-hover: var(--mx-lime) !important;
+        --button-background-color-primary-active: var(--mx-bright) !important;
+        --button-text-color-primary: var(--mx-black) !important;
+
+        --newtab-background-color: var(--mx-black) !important;
+        --newtab-background-color-secondary: var(--mx-bg1) !important;
+        --newtab-background-card: var(--mx-bg1) !important;
+        --newtab-text-primary-color: var(--mx-fg) !important;
+        --newtab-text-secondary-color: var(--mx-mid) !important;
+        --newtab-contextual-text-primary-color: var(--mx-fg) !important;
+        --newtab-contextual-text-secondary-color: var(--mx-mid) !important;
+        --newtab-element-hover-color: var(--mx-bg2) !important;
+        --newtab-element-active-color: var(--mx-bg3) !important;
+        --newtab-element-secondary-color: var(--mx-bg2) !important;
+        --newtab-element-secondary-hover-color: var(--mx-bg3) !important;
+        --newtab-primary-action-background: var(--mx-fg) !important;
+        --newtab-primary-element-text-color: var(--mx-black) !important;
+        --newtab-wordmark-color: var(--mx-bright) !important;
+        --newtab-button-background: var(--mx-bg2) !important;
+        --newtab-button-text: var(--mx-fg) !important;
+        --newtab-button-hover-background: var(--mx-bg3) !important;
+        --newtab-weather-background-color: var(--mx-bg1) !important;
+    }
+
+    ::selection {
+        background-color: var(--mx-bg3) !important;
+        color: var(--mx-bright) !important;
+    }
+}

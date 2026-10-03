@@ -1,0 +1,33 @@
+{
+    "manifest_version": 3,
+    "name": "Matrix",
+    "version": "1.0",
+    "description": "Black frame, green text, nvim matrix palette",
+    "theme": {
+        "colors": {
+            "frame": [0, 0, 0],
+            "frame_inactive": [0, 0, 0],
+            "frame_incognito": [0, 0, 0],
+            "frame_incognito_inactive": [0, 0, 0],
+            "background_tab": [0, 0, 0],
+            "background_tab_inactive": [0, 0, 0],
+            "background_tab_incognito": [0, 0, 0],
+            "background_tab_incognito_inactive": [0, 0, 0],
+            "tab_text": [0, 255, 65],
+            "tab_background_text": [21, 154, 56],
+            "tab_background_text_inactive": [11, 107, 38],
+            "tab_background_text_incognito": [21, 154, 56],
+            "tab_background_text_incognito_inactive": [11, 107, 38],
+            "toolbar": [1, 21, 8],
+            "toolbar_text": [32, 200, 74],
+            "toolbar_button_icon": [32, 200, 74],
+            "bookmark_text": [32, 200, 74],
+            "omnibox_background": [0, 0, 0],
+            "omnibox_text": [32, 200, 74],
+            "ntp_background": [0, 0, 0],
+            "ntp_text": [32, 200, 74],
+            "ntp_link": [77, 255, 136],
+            "ntp_header": [3, 36, 13]
+        }
+    }
+}

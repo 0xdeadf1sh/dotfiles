@@ -98,9 +98,6 @@ help() {
     "$@" --help 2>&1 | bathelp
 }
 
-# make cmatrix monochrome
-alias cmatrix='cmatrix -C white'
-
 # enable unified memory for llama.cpp
 export GGML_CUDA_ENABLE_UNIFIED_MEMORY=1
 

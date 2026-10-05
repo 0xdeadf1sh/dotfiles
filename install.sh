@@ -25,6 +25,13 @@ link "$d/desktop.tmux.conf" ~/.tmux.conf
 link "$d/desktop.gdbinit"   ~/.gdbinit
 link "$d/kitty.conf"        ~/.config/kitty/kitty.conf
 link "$d/nvim"              ~/.config/nvim
+if ! command -v pyright >/dev/null; then
+    if command -v pacman >/dev/null; then
+        sudo pacman -S --needed --noconfirm pyright
+    else
+        echo "pyright missing; nvim Python LSP off"
+    fi
+fi
 link "$d/lsd"               ~/.config/lsd
 link "$d/bat"               ~/.config/bat
 command -v bat >/dev/null && bat cache --build >/dev/null

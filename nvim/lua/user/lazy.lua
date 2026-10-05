@@ -307,6 +307,29 @@ require("lazy").setup({
 				settings = { Lua = { completion = { callSnippet = "Replace" } } },
 			})
 
+			vim.lsp.config("pyright", {
+				before_init = function(_, config)
+					for _, venv in ipairs({ ".venv", "venv" }) do
+						local py = config.root_dir and config.root_dir .. "/" .. venv .. "/bin/python"
+						if py and vim.uv.fs_stat(py) then
+							-- in place: client.settings aliases this table
+							config.settings.python = config.settings.python or {}
+							config.settings.python.pythonPath = py
+							return
+						end
+					end
+				end,
+			})
+
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local client = vim.lsp.get_client_by_id(args.data.client_id)
+					if client and client.name == "ruff" then
+						client.server_capabilities.hoverProvider = false
+					end
+				end,
+			})
+
 			local tools = {
 				"asm_lsp",
 				"lua_ls",
@@ -324,10 +347,10 @@ require("lazy").setup({
 
 			-- rustaceanvim and typescript-tools start their own clients for the first two
 			require("mason-lspconfig").setup({
-				automatic_enable = { exclude = { "rust_analyzer", "ts_ls", "pyright" } },
+				automatic_enable = { exclude = { "rust_analyzer", "ts_ls" } },
 			})
 
-			vim.lsp.enable({ "clangd", "wgsl_analyzer" })
+			vim.lsp.enable({ "clangd", "wgsl_analyzer", "pyright" })
 		end,
 	},
 

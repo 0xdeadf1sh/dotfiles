@@ -47,9 +47,9 @@ alias diff='diff --color=auto'
 alias gdb='gdb -q --tui'
 
 # prepare the environment
-export EDITOR=vim
-export VISUAL=view
-export PAGER=less
+export EDITOR=/usr/bin/nvim
+export VISUAL=/usr/bin/nvim
+export PAGER=/usr/bin/less
 
 # nice-looking prompt, led by the BG reading where t1dmkd (T1DMKDE) runs, else a penguin
 mark='$(command -v t1dmkd >/dev/null && t1dmkd prompt 2>/dev/null || printf "🐧")'

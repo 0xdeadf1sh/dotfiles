@@ -90,7 +90,7 @@ set -o noclobber
 export PATH=$PATH:$HOME/Desktop/slang/bin:$HOME/.local/bin:$HOME/Android/Sdk/platform-tools:$HOME/Desktop/android-studio/jbr/bin/
 
 # make man pages beautiful
-export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
+export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/\\x1B\]8;;[^\\x1B]*\\x1B.//g; s/.\\x08//g\" | bat -p -lman'"
 
 # make --help beautiful
 alias bathelp='bat --plain --language=help'

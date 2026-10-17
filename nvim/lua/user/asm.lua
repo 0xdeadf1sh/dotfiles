@@ -1,4 +1,5 @@
 local cc = require("user.cc")
+local ui = require("user.ui")
 
 local M = {}
 
@@ -161,36 +162,10 @@ local function extract(lines, path, l1, l2, src)
 	return out
 end
 
-local function render(buf, lines)
-	vim.bo[buf].modifiable = true
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.bo[buf].modifiable = false
-	vim.bo[buf].modified = false
-end
-
-local function geometry()
-	local w = math.min(100, math.floor(vim.o.columns * 0.8))
-	local h = math.min(40, math.floor(vim.o.lines * 0.8))
-	return {
-		relative = "editor",
-		width = w,
-		height = h,
-		row = math.floor((vim.o.lines - h) / 2) - 1,
-		col = math.floor((vim.o.columns - w) / 2),
-		style = "minimal",
-		border = "rounded",
-	}
-end
-
---- a float has no winbar, so the status rides on the border
 local function retitle(s, tail)
-	if not (s and vim.api.nvim_win_is_valid(s.win)) then
-		return
+	if s then
+		ui.retitle(s.win, ("%s  %d-%d  -O%s  ·  %s"):format(vim.fs.basename(s.path), s.l1, s.l2, s.level, tail))
 	end
-	local cfg = geometry()
-	cfg.title = (" %s  %d-%d  -O%s  ·  %s "):format(vim.fs.basename(s.path), s.l1, s.l2, s.level, tail)
-	cfg.title_pos = "left"
-	vim.api.nvim_win_set_config(s.win, cfg)
 end
 
 local function run(buf)
@@ -213,7 +188,7 @@ local function run(buf)
 
 			if res.code ~= 0 then
 				vim.bo[buf].filetype = ""
-				render(buf, vim.split(vim.trim(res.stderr or "compile failed"), "\n"))
+				ui.render(buf, vim.split(vim.trim(res.stderr or "compile failed"), "\n"))
 				retitle(s, "failed")
 				return
 			end
@@ -239,7 +214,7 @@ local function run(buf)
 			end
 
 			vim.bo[buf].filetype = "asm"
-			render(buf, body)
+			ui.render(buf, body)
 			retitle(s, "[+/-] level  [R] rerun  [q] close")
 		end)
 	end)
@@ -275,7 +250,7 @@ function M.show(l1, l2)
 	local src = vim.api.nvim_buf_get_lines(src_buf, 0, -1, false)
 
 	local buf = vim.api.nvim_create_buf(false, true)
-	local win = vim.api.nvim_open_win(buf, true, geometry())
+	local win = vim.api.nvim_open_win(buf, true, ui.geometry())
 
 	vim.bo[buf].bufhidden = "wipe"
 	vim.wo[win].wrap = false

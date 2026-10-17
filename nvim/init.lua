@@ -6,6 +6,7 @@ require("user.lazy")
 require("user.autocmd")
 require("user.llama")
 require("user.asm").setup()
+require("user.perf").setup()
 require("user.layout").setup()
 require("user.storage").setup()
 

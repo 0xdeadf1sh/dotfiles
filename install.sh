@@ -35,6 +35,9 @@ fi
 link "$d/lsd"               ~/.config/lsd
 link "$d/bat"               ~/.config/bat
 command -v bat >/dev/null && bat cache --build >/dev/null
+if command -v makepkg >/dev/null; then
+    link "$d/makepkg.conf" "${XDG_CONFIG_HOME:-$HOME/.config}/pacman/makepkg.conf"
+fi
 
 ff_linked=0
 for ff in "${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox" ~/.mozilla/firefox \

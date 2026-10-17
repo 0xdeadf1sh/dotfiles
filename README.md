@@ -12,6 +12,7 @@ Configuration for bash, tmux, kitty, neovim, gdb, git and Claude Code on x86_64 
 | `desktop.gdbinit` | `~/.gdbinit` |
 | `kitty.conf` | `~/.config/kitty/kitty.conf` |
 | `nvim/` | `~/.config/nvim` |
+| `makepkg.conf` | `~/.config/pacman/makepkg.conf`, only where `makepkg` exists |
 | `claude/{CLAUDE.md,settings.json,statusline-command.sh,hooks,skills}` | `~/.claude/` |
 | `git-hooks/` | `core.hooksPath` in `desktop.gitconfig` |
 | `mouseless/config.yaml` | mouseless app config |

@@ -338,6 +338,7 @@ require("lazy").setup({
 				"rust_analyzer",
 				"ts_ls",
 				"stylua",
+				"clang-format",
 			}
 			-- Mason ships clangd for x86_64 Linux only; other hosts run the system clangd
 			if vim.uv.os_uname().machine == "x86_64" then
@@ -384,6 +385,7 @@ require("lazy").setup({
 			formatters_by_ft = {
 				lua = { "stylua" },
 				python = { "ruff_organize_imports", "ruff_format" },
+				cpp = { "clang-format" },
 			},
 		},
 	},

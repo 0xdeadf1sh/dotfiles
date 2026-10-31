@@ -351,7 +351,11 @@ require("lazy").setup({
 				automatic_enable = { exclude = { "rust_analyzer", "ts_ls" } },
 			})
 
-			vim.lsp.enable({ "clangd", "wgsl_analyzer", "pyright" })
+			vim.lsp.config("slangd", {
+				settings = { slang = { inlayHints = { deducedTypes = true, parameterNames = true } } },
+			})
+
+			vim.lsp.enable({ "clangd", "wgsl_analyzer", "pyright", "slangd" })
 		end,
 	},
 
@@ -728,6 +732,7 @@ require("lazy").setup({
 				"python",
 				"query",
 				"rust",
+				"slang",
 				"toml",
 				"tsx",
 				"typescript",
@@ -737,6 +742,7 @@ require("lazy").setup({
 				"yaml",
 			}
 			require("nvim-treesitter").install(langs)
+			vim.treesitter.language.register("slang", "shaderslang")
 			vim.api.nvim_create_autocmd("FileType", {
 				callback = function(args)
 					pcall(vim.treesitter.start, args.buf)
